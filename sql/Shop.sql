@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Апр 25 2024 г., 19:34
+-- Время создания: Апр 29 2024 г., 16:18
 -- Версия сервера: 8.0.30
 -- Версия PHP: 7.2.34
 
@@ -24,10 +24,10 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `Fish`
+-- Структура таблицы `Items`
 --
 
-CREATE TABLE `Fish` (
+CREATE TABLE `Items` (
   `Id` int NOT NULL,
   `Name` varchar(255) NOT NULL,
   `Description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
@@ -41,10 +41,10 @@ CREATE TABLE `Fish` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Дамп данных таблицы `Fish`
+-- Дамп данных таблицы `Items`
 --
 
-INSERT INTO `Fish` (`Id`, `Name`, `Description`, `TypeId`, `IsInStock`, `IsAvailable`, `CreationDate`, `Price`, `Discount`, `Sex`) VALUES
+INSERT INTO `Items` (`Id`, `Name`, `Description`, `TypeId`, `IsInStock`, `IsAvailable`, `CreationDate`, `Price`, `Discount`, `Sex`) VALUES
 (1, 'RARE SUPER BLACK HALFMOON BETTA FISH', 'Rare Super Black Halfmoon Betta Fish is a stunning exotic species originating from Thailand, selectively bred by our breeders to have a perfect black color on its body. Its striking half-moon shaped tail and vibrant colors make it a captivating addition to any aquarium. Bring home The Super Black Halfmoon Betta Fish today and experience the beauty of this magnificent creature.', 1, 1, 1, '2024-04-24 00:00:00', '93.37', 20, 'male'),
 (2, 'RARE HALFMOON RUBY RED BUTTERFLY BETTA FISH', 'Halfmoon Ruby Red Butterfly Betta Fish is a stunning exotic species originating from Thailand, selectively bred by our breeders to have a perfect ruby red color on its body. Its striking half-moon shaped tail and vibrant colors make it a captivating addition to any aquarium. Bring home The Halfmoon Ruby Red Butterfly Betta Fish today and experience the beauty of this magnificent creature.', 1, 1, 1, '2024-04-24 00:00:00', '56.00', 15, 'male'),
 (3, 'HALFMOON BLUE BETTA FISH', 'Halfmoon Blue Betta Fish is a stunning exotic species originating from Thailand, selectively bred by our breeders to have a perfect sparkling purple blue on its body. Its striking half-moon shaped tail and vibrant colors make it a captivating addition to any aquarium. Bring home The Halfmoon Blue Betta Fish today and experience the beauty of this magnificent creature.', 1, 1, 1, '2024-04-24 00:00:00', '49.04', 20, 'male'),
@@ -58,20 +58,20 @@ INSERT INTO `Fish` (`Id`, `Name`, `Description`, `TypeId`, `IsInStock`, `IsAvail
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `FishFiles`
+-- Структура таблицы `ItemsFiles`
 --
 
-CREATE TABLE `FishFiles` (
+CREATE TABLE `ItemsFiles` (
   `Id` int NOT NULL,
   `FileName` varchar(255) NOT NULL,
-  `FishId` int NOT NULL
+  `ItemId` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Дамп данных таблицы `FishFiles`
+-- Дамп данных таблицы `ItemsFiles`
 --
 
-INSERT INTO `FishFiles` (`Id`, `FileName`, `FishId`) VALUES
+INSERT INTO `ItemsFiles` (`Id`, `FileName`, `ItemId`) VALUES
 (12, '1.webp', 1),
 (13, '2.webp', 2),
 (14, '3.webp', 3),
@@ -140,18 +140,18 @@ INSERT INTO `Types` (`Id`, `Name`, `Description`) VALUES
 --
 
 --
--- Индексы таблицы `Fish`
+-- Индексы таблицы `Items`
 --
-ALTER TABLE `Fish`
+ALTER TABLE `Items`
   ADD PRIMARY KEY (`Id`),
   ADD KEY `fish_ibfk_1` (`TypeId`);
 
 --
--- Индексы таблицы `FishFiles`
+-- Индексы таблицы `ItemsFiles`
 --
-ALTER TABLE `FishFiles`
+ALTER TABLE `ItemsFiles`
   ADD PRIMARY KEY (`Id`),
-  ADD KEY `FishId` (`FishId`);
+  ADD KEY `FishId` (`ItemId`);
 
 --
 -- Индексы таблицы `TypeFiles`
@@ -171,15 +171,15 @@ ALTER TABLE `Types`
 --
 
 --
--- AUTO_INCREMENT для таблицы `Fish`
+-- AUTO_INCREMENT для таблицы `Items`
 --
-ALTER TABLE `Fish`
+ALTER TABLE `Items`
   MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
--- AUTO_INCREMENT для таблицы `FishFiles`
+-- AUTO_INCREMENT для таблицы `ItemsFiles`
 --
-ALTER TABLE `FishFiles`
+ALTER TABLE `ItemsFiles`
   MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
@@ -199,16 +199,16 @@ ALTER TABLE `Types`
 --
 
 --
--- Ограничения внешнего ключа таблицы `Fish`
+-- Ограничения внешнего ключа таблицы `Items`
 --
-ALTER TABLE `Fish`
-  ADD CONSTRAINT `fish_ibfk_1` FOREIGN KEY (`TypeId`) REFERENCES `Types` (`Id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+ALTER TABLE `Items`
+  ADD CONSTRAINT `items_ibfk_1` FOREIGN KEY (`TypeId`) REFERENCES `Types` (`Id`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
 --
--- Ограничения внешнего ключа таблицы `FishFiles`
+-- Ограничения внешнего ключа таблицы `ItemsFiles`
 --
-ALTER TABLE `FishFiles`
-  ADD CONSTRAINT `fishfiles_ibfk_1` FOREIGN KEY (`FishId`) REFERENCES `Fish` (`Id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE `ItemsFiles`
+  ADD CONSTRAINT `itemsfiles_ibfk_1` FOREIGN KEY (`ItemId`) REFERENCES `Items` (`Id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
 -- Ограничения внешнего ключа таблицы `TypeFiles`

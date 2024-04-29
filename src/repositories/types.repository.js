@@ -8,15 +8,15 @@ export const readAllTypes = async () => {
 
 export const readTypesByTypeName = async typeName => {
     return await executeQuery(`SELECT 
-        f.Id as FishId, f.Name as FishName, f.Price, 
-        fs.FileName,
-        f.Discount, f.IsInStock, f.IsAvailable, 
+        i.Id as ItemId, i.Name as ItemName, i.Price, 
+        ifs.FileName,
+        i.Discount, i.IsInStock, i.IsAvailable, 
         t.Name, t.Description, t.Id,
-        f.Sex
+        i.Sex
         FROM Types as t 
-        INNER JOIN Fish as f 
-        ON t.Id=f.TypeId
-        INNER JOIN FishFiles as fs
-        ON f.Id=fs.fishId
+        INNER JOIN Items as i 
+        ON t.Id=i.TypeId
+        INNER JOIN ItemsFiles as ifs
+        ON i.Id=ifs.itemId
         WHERE t.Name='${typeName}'`);
 };

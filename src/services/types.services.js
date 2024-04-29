@@ -22,12 +22,12 @@ export const getCollectionByType = async (req, res, next) => {
             collection.length > 0
                 ? collection.map(item => ({
                       ...generateDTO(item),
-                      ...generateFishDTO(item),
+                      ...generateItemDTO(item),
                   }))
                 : []
         );
     } catch (err) {
-        console.error('Error while reading fish by type', err.message);
+        console.error('Error while reading item by type', err.message);
         next(err);
     }
 };
@@ -39,20 +39,20 @@ const generateDTO = type => ({
     typeDescription: type.Description,
 });
 
-const generateFishDTO = fish => ({
-    fishId: fish.FishId,
-    fishName: fish.FishName,
-    type: fish.Type,
-    regularPrice: fish.Price,
+const generateItemDTO = item => ({
+    itemId: item.ItemId,
+    itemName: item.ItemName,
+    type: item.Type,
+    regularPrice: item.Price,
     actualPrice: Number(
-        fish.Price - (fish.Price * fish.Discount) / 100
+        item.Price - (item.Price * item.Discount) / 100
     ).toFixed(2),
-    discount: fish.Discount,
-    description: fish.Description,
-    isInStock: Boolean(fish.IsInStock),
-    ...(fish.IsAvailable !== undefined && {
-        isAvailable: Boolean(fish.IsAvailable),
+    discount: item.Discount,
+    description: item.Description,
+    isInStock: Boolean(item.IsInStock),
+    ...(item.IsAvailable !== undefined && {
+        isAvailable: Boolean(item.IsAvailable),
     }),
-    sex: fish.Sex,
-    fileName: fish.FileName,
+    sex: item.Sex,
+    fileName: item.FileName,
 });

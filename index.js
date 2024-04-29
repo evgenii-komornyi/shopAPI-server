@@ -2,7 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import fishRouter from './src/routes/fish.routes.js';
+import itemsRouter from './src/routes/items.routes.js';
 import typesRouter from './src/routes/types.routes.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -26,7 +26,7 @@ app.get('/', (req, res) => {
 
     res.send(`Hello to server API. Your IP is: ${ip}`);
 });
-app.use('/fish', fishRouter);
+app.use('/items', itemsRouter);
 app.use('/types', typesRouter);
 app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
 

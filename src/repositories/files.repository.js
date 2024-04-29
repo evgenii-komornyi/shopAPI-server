@@ -1,7 +1,7 @@
 import { executeQuery } from '../db/dbConnection.db.js';
 
-export const readFishFiles = async fishId => {
+export const readItemFiles = async itemId => {
     return await executeQuery(
-        `SELECT Id, FileName FROM FishFiles WHERE FishId='${fishId}'`
+        `SELECT Id, FileName FROM ItemsFiles WHERE ItemId='${itemId}'`
     );
 };

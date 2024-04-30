@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Апр 29 2024 г., 16:18
+-- Время создания: Апр 30 2024 г., 16:08
 -- Версия сервера: 8.0.30
 -- Версия PHP: 7.2.34
 
@@ -20,6 +20,37 @@ SET time_zone = "+00:00";
 --
 -- База данных: `Shop`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `Addresses`
+--
+
+CREATE TABLE `Addresses` (
+  `Id` int NOT NULL,
+  `ClientId` int NOT NULL,
+  `Country` varchar(255) NOT NULL,
+  `City` varchar(255) NOT NULL,
+  `Address` varchar(255) NOT NULL,
+  `PostalCode` varchar(40) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `Clients`
+--
+
+CREATE TABLE `Clients` (
+  `Id` int NOT NULL,
+  `Email` varchar(255) NOT NULL,
+  `PhoneNumber` varchar(15) NOT NULL,
+  `CreationDate` datetime NOT NULL,
+  `UpdateDate` datetime NOT NULL,
+  `FirstName` varchar(255) NOT NULL,
+  `LastName` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -85,6 +116,23 @@ INSERT INTO `ItemsFiles` (`Id`, `FileName`, `ItemId`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Структура таблицы `Orders`
+--
+
+CREATE TABLE `Orders` (
+  `Id` int NOT NULL,
+  `Status` tinyint NOT NULL,
+  `OrderDate` datetime NOT NULL,
+  `ClientId` int NOT NULL,
+  `DeliveryAddressId` int NOT NULL,
+  `DeliveryComment` varchar(100) DEFAULT NULL,
+  `TotalPrice` decimal(9,2) NOT NULL,
+  `DeliveryType` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Структура таблицы `TypeFiles`
 --
 
@@ -140,6 +188,19 @@ INSERT INTO `Types` (`Id`, `Name`, `Description`) VALUES
 --
 
 --
+-- Индексы таблицы `Addresses`
+--
+ALTER TABLE `Addresses`
+  ADD PRIMARY KEY (`Id`),
+  ADD KEY `ClientId` (`ClientId`);
+
+--
+-- Индексы таблицы `Clients`
+--
+ALTER TABLE `Clients`
+  ADD PRIMARY KEY (`Id`);
+
+--
 -- Индексы таблицы `Items`
 --
 ALTER TABLE `Items`
@@ -152,6 +213,12 @@ ALTER TABLE `Items`
 ALTER TABLE `ItemsFiles`
   ADD PRIMARY KEY (`Id`),
   ADD KEY `FishId` (`ItemId`);
+
+--
+-- Индексы таблицы `Orders`
+--
+ALTER TABLE `Orders`
+  ADD PRIMARY KEY (`Id`);
 
 --
 -- Индексы таблицы `TypeFiles`
@@ -171,6 +238,18 @@ ALTER TABLE `Types`
 --
 
 --
+-- AUTO_INCREMENT для таблицы `Addresses`
+--
+ALTER TABLE `Addresses`
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT для таблицы `Clients`
+--
+ALTER TABLE `Clients`
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT для таблицы `Items`
 --
 ALTER TABLE `Items`
@@ -181,6 +260,12 @@ ALTER TABLE `Items`
 --
 ALTER TABLE `ItemsFiles`
   MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+
+--
+-- AUTO_INCREMENT для таблицы `Orders`
+--
+ALTER TABLE `Orders`
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT для таблицы `TypeFiles`
@@ -197,6 +282,12 @@ ALTER TABLE `Types`
 --
 -- Ограничения внешнего ключа сохраненных таблиц
 --
+
+--
+-- Ограничения внешнего ключа таблицы `Addresses`
+--
+ALTER TABLE `Addresses`
+  ADD CONSTRAINT `addresses_ibfk_1` FOREIGN KEY (`ClientId`) REFERENCES `Clients` (`Id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
 -- Ограничения внешнего ключа таблицы `Items`

@@ -2,8 +2,9 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import itemsRouter from './src/routes/items.routes.js';
-import typesRouter from './src/routes/types.routes.js';
+import itemsRouter from './src/routes/items.route.js';
+import typesRouter from './src/routes/types.route.js';
+import ordersRouter from './src/routes/orders.route.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -29,6 +30,7 @@ app.get('/', (req, res) => {
 app.use('/items', itemsRouter);
 app.use('/types', typesRouter);
 app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
+app.use('/orders', ordersRouter);
 
 app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500;

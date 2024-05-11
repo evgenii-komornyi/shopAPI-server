@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Апр 30 2024 г., 16:08
+-- Время создания: Май 11 2024 г., 21:09
 -- Версия сервера: 8.0.30
 -- Версия PHP: 7.2.34
 
@@ -29,7 +29,7 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `Addresses` (
   `Id` int NOT NULL,
-  `ClientId` int NOT NULL,
+  `ClientId` int DEFAULT NULL,
   `Country` varchar(255) NOT NULL,
   `City` varchar(255) NOT NULL,
   `Address` varchar(255) NOT NULL,
@@ -49,7 +49,8 @@ CREATE TABLE `Clients` (
   `CreationDate` datetime NOT NULL,
   `UpdateDate` datetime NOT NULL,
   `FirstName` varchar(255) NOT NULL,
-  `LastName` varchar(255) NOT NULL
+  `LastName` varchar(255) NOT NULL,
+  `UClientId` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
@@ -121,13 +122,28 @@ INSERT INTO `ItemsFiles` (`Id`, `FileName`, `ItemId`) VALUES
 
 CREATE TABLE `Orders` (
   `Id` int NOT NULL,
-  `Status` tinyint NOT NULL,
+  `Status` varchar(20) NOT NULL,
   `OrderDate` datetime NOT NULL,
   `ClientId` int NOT NULL,
-  `DeliveryAddressId` int NOT NULL,
+  `DeliveryAddressId` int DEFAULT NULL,
   `DeliveryComment` varchar(100) DEFAULT NULL,
   `TotalPrice` decimal(9,2) NOT NULL,
-  `DeliveryType` varchar(255) NOT NULL
+  `DeliveryType` varchar(255) NOT NULL,
+  `UOrderId` varchar(12) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `OrdersItems`
+--
+
+CREATE TABLE `OrdersItems` (
+  `Id` int NOT NULL,
+  `OrderId` int NOT NULL,
+  `ItemId` int NOT NULL,
+  `ItemPrice` decimal(4,2) NOT NULL DEFAULT '0.00',
+  `ItemQuantity` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
@@ -198,7 +214,8 @@ ALTER TABLE `Addresses`
 -- Индексы таблицы `Clients`
 --
 ALTER TABLE `Clients`
-  ADD PRIMARY KEY (`Id`);
+  ADD PRIMARY KEY (`Id`),
+  ADD UNIQUE KEY `UClientId` (`UClientId`);
 
 --
 -- Индексы таблицы `Items`
@@ -218,7 +235,16 @@ ALTER TABLE `ItemsFiles`
 -- Индексы таблицы `Orders`
 --
 ALTER TABLE `Orders`
-  ADD PRIMARY KEY (`Id`);
+  ADD PRIMARY KEY (`Id`),
+  ADD UNIQUE KEY `UOrderId` (`UOrderId`);
+
+--
+-- Индексы таблицы `OrdersItems`
+--
+ALTER TABLE `OrdersItems`
+  ADD PRIMARY KEY (`Id`),
+  ADD KEY `OrderId` (`OrderId`),
+  ADD KEY `ItemId` (`ItemId`);
 
 --
 -- Индексы таблицы `TypeFiles`
@@ -241,13 +267,13 @@ ALTER TABLE `Types`
 -- AUTO_INCREMENT для таблицы `Addresses`
 --
 ALTER TABLE `Addresses`
-  MODIFY `Id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT для таблицы `Clients`
 --
 ALTER TABLE `Clients`
-  MODIFY `Id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
 
 --
 -- AUTO_INCREMENT для таблицы `Items`
@@ -265,7 +291,13 @@ ALTER TABLE `ItemsFiles`
 -- AUTO_INCREMENT для таблицы `Orders`
 --
 ALTER TABLE `Orders`
-  MODIFY `Id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+
+--
+-- AUTO_INCREMENT для таблицы `OrdersItems`
+--
+ALTER TABLE `OrdersItems`
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
 
 --
 -- AUTO_INCREMENT для таблицы `TypeFiles`
@@ -284,12 +316,6 @@ ALTER TABLE `Types`
 --
 
 --
--- Ограничения внешнего ключа таблицы `Addresses`
---
-ALTER TABLE `Addresses`
-  ADD CONSTRAINT `addresses_ibfk_1` FOREIGN KEY (`ClientId`) REFERENCES `Clients` (`Id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
-
---
 -- Ограничения внешнего ключа таблицы `Items`
 --
 ALTER TABLE `Items`
@@ -300,6 +326,13 @@ ALTER TABLE `Items`
 --
 ALTER TABLE `ItemsFiles`
   ADD CONSTRAINT `itemsfiles_ibfk_1` FOREIGN KEY (`ItemId`) REFERENCES `Items` (`Id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+--
+-- Ограничения внешнего ключа таблицы `OrdersItems`
+--
+ALTER TABLE `OrdersItems`
+  ADD CONSTRAINT `ordersitems_ibfk_1` FOREIGN KEY (`OrderId`) REFERENCES `Orders` (`Id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  ADD CONSTRAINT `ordersitems_ibfk_2` FOREIGN KEY (`ItemId`) REFERENCES `Items` (`Id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
 -- Ограничения внешнего ключа таблицы `TypeFiles`

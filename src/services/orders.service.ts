@@ -1,67 +1,104 @@
+import { NextFunction, Request } from 'express';
+
 import generateUniqueId from 'generate-unique-id';
 import {
     create as createOrderInDB,
     createCartInOrder as createCartInOrderInDB,
     readOrderById,
     readItemsInOrderById,
-} from '../repositories/orders.repository.js';
-import { create as createClientInDB } from '../repositories/clients.repository.js';
-import { create as createAddressInDB } from '../repositories/addresses.repository.js';
+} from '../repositories/orders.repository';
+import { create as createClientInDB } from '../repositories/clients.repository';
+import { create as createAddressInDB } from '../repositories/addresses.repository';
 import { createConnection } from 'mysql2/promise.js';
-import { config } from '../db/config.js';
+import { config } from '../db/config';
 import {
     closeConnection,
     commit,
     rollback,
     startTransaction,
-} from '../db/dbConnection.db.js';
-import { readItemFiles } from '../repositories/files.repository.js';
+} from '../db/dbConnection.db';
 
-export const createOrder = async ({ body }, res, next) => {
+import { OrderValidation } from '../validation/order/OrderValidation';
+import { CreateRequestValidation } from '../validation/order/CreateOrderRequestValidation';
+import { OrderValidationErrors } from '../validation/errors/OrderValidationErrors';
+import { OrderCreateRequest } from '../entities/order/request/OrderCreateRequest';
+import { DeliveryType } from '../enums/DeliveryType';
+
+export const createOrder = async (
+    { body }: Request<OrderCreateRequest>,
+    res: Response,
+    next: NextFunction
+) => {
     let connection;
+    const { email, firstName, lastName, phoneNumber } = body.client;
+    const { deliveryType } = body.orderInfo;
+    const { country, city, postalCode, address } = body.address;
 
-    try {
-        connection = await createConnection(config.db);
-        await startTransaction(connection);
-        const UClientId = generateUniqueId({
-            length: 16,
-            useLetters: false,
-            useNumbers: true,
-        });
-        const clientId = await createNewClientAndGetClientId(
-            body.client,
-            UClientId
-        );
+    const validator = new OrderValidation(new CreateRequestValidation());
 
-        let addressId = null;
+    const orderCreateRequest = new OrderCreateRequest(
+        email,
+        firstName,
+        lastName,
+        phoneNumber
+    );
 
-        if (body.orderInfo.deliveryType !== 'shop') {
-            addressId = await createNewAddressAndGetAddressId(
-                body.address,
-                clientId
+    if (deliveryType === DeliveryType.COURIER) {
+        orderCreateRequest.withCountry(country);
+        orderCreateRequest.withCity(city);
+        orderCreateRequest.withPostalCode(postalCode);
+        orderCreateRequest.withAddress(address);
+    }
+
+    const validationErrors: OrderValidationErrors =
+        validator.$CreateRequestValidation.validate(orderCreateRequest);
+
+    if (validationErrors.length === 0) {
+        try {
+            connection = await createConnection(config.db);
+            await startTransaction(connection);
+            const UClientId = generateUniqueId({
+                length: 16,
+                useLetters: false,
+                useNumbers: true,
+            });
+            const clientId = await createNewClientAndGetClientId(
+                body.client,
+                UClientId
             );
+
+            let addressId = null;
+
+            if (body.orderInfo.deliveryType !== 'shop') {
+                addressId = await createNewAddressAndGetAddressId(
+                    body.address,
+                    clientId
+                );
+            }
+
+            const UOrderId = generateUniqueId({ length: 9, useLetters: false });
+            const orderId = await createNewOrderAndGetOrderId(
+                body.orderInfo,
+                addressId,
+                clientId,
+                UOrderId
+            );
+
+            await createCartInOrder(body.cart, orderId);
+
+            await commit(connection);
+
+            res.json({ orderId: UOrderId, clientId: UClientId });
+        } catch (err) {
+            await rollback(connection);
+            await closeConnection(connection);
+
+            res.json(err.message);
+
+            next(err);
         }
-
-        const UOrderId = generateUniqueId({ length: 9, useLetters: false });
-        const orderId = await createNewOrderAndGetOrderId(
-            body.orderInfo,
-            addressId,
-            clientId,
-            UOrderId
-        );
-
-        await createCartInOrder(body.cart, orderId);
-
-        await commit(connection);
-
-        res.json({ orderId: UOrderId, clientId: UClientId });
-    } catch (err) {
-        await rollback(connection);
-        await closeConnection(connection);
-
-        res.json(err.message);
-
-        next(err);
+    } else {
+        res.json({ validationErrors });
     }
 };
 

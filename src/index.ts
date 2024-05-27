@@ -2,9 +2,9 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import itemsRouter from './src/routes/items.route.js';
-import typesRouter from './src/routes/types.route.js';
-import ordersRouter from './src/routes/orders.route.js';
+import itemsRouter from './routes/items.route.ts';
+import typesRouter from './routes/types.route.ts';
+import ordersRouter from './routes/orders.route.ts';
 import path from 'path';
 import { fileURLToPath } from 'url';
 

@@ -1,7 +1,7 @@
 import {
     readAllTypes,
     readTypesByTypeName,
-} from '../repositories/types.repository.js';
+} from '../repositories/types.repository';
 
 export const getAllTypes = async (_, res, next) => {
     try {

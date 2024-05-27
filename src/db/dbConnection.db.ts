@@ -22,6 +22,7 @@ export const executeQuery = async (sql, params = []) => {
 
     try {
         connection = await createConnection(config.db);
+
         const [results] = await connection.execute(sql, params);
 
         return results;

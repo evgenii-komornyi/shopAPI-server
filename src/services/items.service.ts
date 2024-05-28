@@ -1,5 +1,5 @@
-import { readItemFiles } from '../repositories/files.repository';
-import { readAllItems, readItemById } from '../repositories/item.repository';
+import { readItemFiles } from '../repositories/files.repository.ts';
+import { readAllItems, readItemById } from '../repositories/item.repository.ts';
 
 export const getAllItems = async (_, res, next) => {
     try {

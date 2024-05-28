@@ -6,29 +6,29 @@ import {
     createCartInOrder as createCartInOrderInDB,
     readOrderById,
     readItemsInOrderById,
-} from '../repositories/orders.repository';
-import { create as createClientInDB } from '../repositories/clients.repository';
-import { create as createAddressInDB } from '../repositories/addresses.repository';
+} from '../repositories/orders.repository.ts';
+import { create as createClientInDB } from '../repositories/clients.repository.ts';
+import { create as createAddressInDB } from '../repositories/addresses.repository.ts';
 import { createConnection } from 'mysql2/promise.js';
-import { config } from '../db/config';
+import { config } from '../db/config.ts';
 import {
     closeConnection,
     commit,
     rollback,
     startTransaction,
-} from '../db/dbConnection.db';
+} from '../db/dbConnection.db.ts';
 
-import { OrderValidation } from '../validation/order/OrderValidation';
-import { CreateRequestValidation } from '../validation/order/CreateOrderRequestValidation';
-import { OrderValidationErrors } from '../validation/errors/OrderValidationErrors';
-import { OrderCreateRequest } from '../entities/order/request/OrderCreateRequest';
-import { DeliveryType } from '../enums/DeliveryType';
+import { OrderValidation } from '../validation/order/OrderValidation.ts';
+import { CreateRequestValidation } from '../validation/order/CreateOrderRequestValidation.ts';
+import { OrderValidationErrors } from '../validation/errors/OrderValidationErrors.ts';
+import { OrderCreateRequest } from '../entities/order/request/OrderCreateRequest.ts';
+import { DeliveryType } from '../enums/DeliveryType.ts';
 
 export const createOrder = async (
-    { body }: Request<OrderCreateRequest>,
+    { body }: Request,
     res: Response,
     next: NextFunction
-) => {
+): Promise<void> => {
     let connection;
     const { email, firstName, lastName, phoneNumber } = body.client;
     const { deliveryType } = body.orderInfo;
@@ -40,7 +40,8 @@ export const createOrder = async (
         email,
         firstName,
         lastName,
-        phoneNumber
+        phoneNumber,
+        deliveryType
     );
 
     if (deliveryType === DeliveryType.COURIER) {
@@ -50,7 +51,7 @@ export const createOrder = async (
         orderCreateRequest.withAddress(address);
     }
 
-    const validationErrors: OrderValidationErrors =
+    const validationErrors: OrderValidationErrors[] =
         validator.$CreateRequestValidation.validate(orderCreateRequest);
 
     if (validationErrors.length === 0) {
@@ -103,9 +104,9 @@ export const createOrder = async (
 };
 
 export const getOrderById = async (
-    { params: { clientId, orderId } },
-    res,
-    next
+    { params: { clientId, orderId } }: Request,
+    res: Response,
+    next: NextFunction
 ) => {
     try {
         const order = await readOrderById(orderId);

@@ -1,5 +1,5 @@
 import { createConnection } from 'mysql2/promise.js';
-import { config } from './config.js';
+import { config } from './config.ts';
 
 export const closeConnection = async connection => {
     if (connection) return await connection.end();

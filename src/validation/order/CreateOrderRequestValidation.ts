@@ -1,8 +1,8 @@
-import { OrderCreateRequest } from '../../entities/order/request/OrderCreateRequest';
-import { DeliveryType } from '../../enums/DeliveryType';
-import { countryIndex } from '../../helpers/validation.helper';
-import { IValidatable } from '../IValidatable';
-import { OrderValidationErrors } from '../errors/OrderValidationErrors';
+import { OrderCreateRequest } from '../../entities/order/request/OrderCreateRequest.ts';
+import { DeliveryType } from '../../enums/DeliveryType.ts';
+import { countryIndex } from '../../helpers/validation.helper.ts';
+import { IValidatable } from '../IValidatable.ts';
+import { OrderValidationErrors } from '../errors/OrderValidationErrors.ts';
 
 const unicodeLetterPattern: string = '[\\p{L}\\p{M}]';
 const allLettersAndUnicodeFormat: RegExp = new RegExp(

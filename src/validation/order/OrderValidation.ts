@@ -1,4 +1,4 @@
-import { CreateRequestValidation } from './CreateOrderRequestValidation';
+import { CreateRequestValidation } from './CreateOrderRequestValidation.ts';
 
 export class OrderValidation {
     private _CreateRequestValidation: CreateRequestValidation;

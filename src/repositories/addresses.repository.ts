@@ -1,4 +1,4 @@
-import { executeQuery } from '../db/dbConnection.db';
+import { executeQuery } from '../db/dbConnection.db.ts';
 
 export const create = async ({
     country,

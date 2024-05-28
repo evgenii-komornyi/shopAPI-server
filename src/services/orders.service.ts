@@ -1,4 +1,4 @@
-import { NextFunction, Request } from 'express';
+import { NextFunction, Request, Response } from 'express';
 
 import generateUniqueId from 'generate-unique-id';
 import {
@@ -89,7 +89,10 @@ export const createOrder = async (
 
             await commit(connection);
 
-            res.json({ orderId: UOrderId, clientId: UClientId });
+            res.json({
+                orderId: UOrderId,
+                clientId: UClientId,
+            });
         } catch (err) {
             await rollback(connection);
             await closeConnection(connection);

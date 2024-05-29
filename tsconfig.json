@@ -5,6 +5,8 @@
         "moduleResolution": "NodeNext",
         "outDir": "./dist",
         "noEmit": true,
-        "allowImportingTsExtensions": true
+        "allowImportingTsExtensions": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true
     }
 }

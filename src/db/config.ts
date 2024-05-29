@@ -1,4 +1,6 @@
-export const config = {
+import { IConfig } from './IConfig.ts';
+
+export const config: IConfig = {
     db: {
         host: 'localhost',
         user: 'evgenii',

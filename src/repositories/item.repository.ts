@@ -1,4 +1,4 @@
-import { executeQuery } from '../db/dbConnection.db.js';
+import { executeQuery } from '../db/dbConnection.db.ts';
 
 export const readAllItems = async () => {
     return await executeQuery(`SELECT 

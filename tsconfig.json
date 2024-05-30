@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "module": "NodeNext",
+        "rootDir": "./src",
+        "moduleResolution": "NodeNext",
+        "outDir": "./dist",
+        "noEmit": true,
+        "allowImportingTsExtensions": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true
+    }
+}

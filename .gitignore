@@ -1,6 +1,5 @@
 node_modules/
+dist/
 
 .env.local
-src/db/config.js
-
-yarn.lock
+src/db/config.ts

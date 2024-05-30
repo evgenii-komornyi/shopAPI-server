@@ -1,27 +1,40 @@
-import { createConnection } from 'mysql2/promise.js';
-import { config } from './config.js';
+import {
+    createConnection,
+    Connection,
+    QueryOptions,
+    QueryResult,
+} from 'mysql2/promise.js';
+import { config } from './config.ts';
 
-export const closeConnection = async connection => {
+export const closeConnection = async (
+    connection: Connection
+): Promise<void> => {
     if (connection) return await connection.end();
 };
 
-export const startTransaction = async connection => {
+export const startTransaction = async (
+    connection: Connection
+): Promise<void> => {
     if (connection) return await connection.beginTransaction();
 };
 
-export const commit = async connection => {
+export const commit = async (connection: Connection): Promise<void> => {
     if (connection) return await connection.commit();
 };
 
-export const rollback = async connection => {
+export const rollback = async (connection: Connection): Promise<void> => {
     if (connection) return await connection.rollback();
 };
 
-export const executeQuery = async (sql, params = []) => {
+export const executeQuery = async (
+    sql: string,
+    params: QueryOptions[] = []
+): Promise<QueryResult[]> => {
     let connection;
 
     try {
         connection = await createConnection(config.db);
+
         const [results] = await connection.execute(sql, params);
 
         return results;

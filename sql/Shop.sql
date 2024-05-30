@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Май 11 2024 г., 21:09
+-- Время создания: Май 30 2024 г., 16:45
 -- Версия сервера: 8.0.30
 -- Версия PHP: 7.2.34
 
@@ -30,11 +30,23 @@ SET time_zone = "+00:00";
 CREATE TABLE `Addresses` (
   `Id` int NOT NULL,
   `ClientId` int DEFAULT NULL,
-  `Country` varchar(255) NOT NULL,
-  `City` varchar(255) NOT NULL,
-  `Address` varchar(255) NOT NULL,
-  `PostalCode` varchar(40) NOT NULL
+  `Country` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `City` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `Address` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `PostalCode` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Дамп данных таблицы `Addresses`
+--
+
+INSERT INTO `Addresses` (`Id`, `ClientId`, `Country`, `City`, `Address`, `PostalCode`) VALUES
+(20, 67, 'Lithuania', 'Vilnus', 'Nava pr. 10', 'EU-5203'),
+(23, 72, 'Latvia', 'Riga', 'Kurzemes prospekts 10', 'LV-1069'),
+(24, 73, 'Lithuania', 'Vilnus', 'Nava pr. 10', 'EU-5203'),
+(25, 74, 'Lithuania', 'Vilnus', 'Nava pr. 10', 'EU-5203'),
+(26, 75, 'Lithuania', 'Vilnus', 'Nava pr. 10', 'EU-5203'),
+(27, 76, 'Lithuania', 'Vilnus', 'Nava pr. 10', 'EU-5203');
 
 -- --------------------------------------------------------
 
@@ -44,14 +56,29 @@ CREATE TABLE `Addresses` (
 
 CREATE TABLE `Clients` (
   `Id` int NOT NULL,
-  `Email` varchar(255) NOT NULL,
+  `Email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `PhoneNumber` varchar(15) NOT NULL,
   `CreationDate` datetime NOT NULL,
   `UpdateDate` datetime NOT NULL,
-  `FirstName` varchar(255) NOT NULL,
-  `LastName` varchar(255) NOT NULL,
+  `FirstName` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `LastName` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `UClientId` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Дамп данных таблицы `Clients`
+--
+
+INSERT INTO `Clients` (`Id`, `Email`, `PhoneNumber`, `CreationDate`, `UpdateDate`, `FirstName`, `LastName`, `UClientId`) VALUES
+(67, 'test@test.test', '+669852114556', '2024-05-14 10:54:09', '2024-05-14 10:54:09', 'Test', 'Testov', '5949341030486182'),
+(68, 'blackdead666999@gmail.com', '25615015', '2024-05-15 13:48:19', '2024-05-15 13:48:19', 'Evgenii', 'Komornyi', '6920319108756100'),
+(69, 'blackdead666999@gmail.com', '25615015', '2024-05-16 07:50:39', '2024-05-16 07:50:39', 'Evgenii', 'Komornyi', '7067334726571925'),
+(72, 'blackdead666999@gmail.com', '+37125615015', '2024-05-23 12:53:13', '2024-05-23 12:53:13', 'Evgenii', 'Komornyi', '6043758673305800'),
+(73, 'test@test.test', '+669852114556', '2024-05-29 08:21:33', '2024-05-29 08:21:33', 'Test', 'Testov', '9271638288031502'),
+(74, 'test@test.test', '+669852114556', '2024-05-29 08:23:53', '2024-05-29 08:23:53', 'Test', 'Testov', '9444715654556702'),
+(75, 'test@test.test', '+669852114556', '2024-05-29 08:26:11', '2024-05-29 08:26:11', 'Test', 'Testov', '2215859638481371'),
+(76, 'test@test.test', '+669852114556', '2024-05-29 08:27:54', '2024-05-29 08:27:54', 'Test', 'Testov', '1034931860054593'),
+(77, 'test@tet.test', '+37125615015', '2024-05-30 12:10:08', '2024-05-30 12:10:08', 'Vasia', 'Pupkin', '0381093492489530');
 
 -- --------------------------------------------------------
 
@@ -132,6 +159,21 @@ CREATE TABLE `Orders` (
   `UOrderId` varchar(12) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+--
+-- Дамп данных таблицы `Orders`
+--
+
+INSERT INTO `Orders` (`Id`, `Status`, `OrderDate`, `ClientId`, `DeliveryAddressId`, `DeliveryComment`, `TotalPrice`, `DeliveryType`, `UOrderId`) VALUES
+(38, 'pending', '2024-05-14 10:54:09', 67, 20, 'Call me before delivery', '50.50', 'courier', '702150625'),
+(39, 'pending', '2024-05-15 13:48:19', 68, NULL, '', '78.43', 'shop', '563802416'),
+(40, 'pending', '2024-05-16 07:50:39', 69, NULL, '', '44.80', 'shop', '369316588'),
+(43, 'pending', '2024-05-23 12:53:13', 72, 23, '', '127.41', 'courier', '731580628'),
+(44, 'pending', '2024-05-29 08:21:33', 73, 24, 'Call me before delivery', '50.50', 'courier', '823026019'),
+(45, 'pending', '2024-05-29 08:23:53', 74, 25, 'Call me before delivery', '50.50', 'courier', '311365157'),
+(46, 'pending', '2024-05-29 08:26:11', 75, 26, 'Call me before delivery', '50.50', 'courier', '355495655'),
+(47, 'pending', '2024-05-29 08:27:54', 76, 27, 'Call me before delivery', '50.50', 'courier', '060479837'),
+(48, 'pending', '2024-05-30 12:10:08', 77, NULL, '', '91.00', 'shop', '930054097');
+
 -- --------------------------------------------------------
 
 --
@@ -145,6 +187,32 @@ CREATE TABLE `OrdersItems` (
   `ItemPrice` decimal(4,2) NOT NULL DEFAULT '0.00',
   `ItemQuantity` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Дамп данных таблицы `OrdersItems`
+--
+
+INSERT INTO `OrdersItems` (`Id`, `OrderId`, `ItemId`, `ItemPrice`, `ItemQuantity`) VALUES
+(63, 38, 1, '74.70', 1),
+(64, 38, 3, '39.23', 1),
+(65, 38, 2, '47.60', 1),
+(66, 39, 3, '39.23', 1),
+(67, 39, 8, '39.20', 1),
+(68, 40, 7, '44.80', 1),
+(74, 43, 11, '42.47', 3),
+(75, 44, 2, '47.60', 1),
+(76, 44, 3, '39.23', 1),
+(77, 44, 1, '74.70', 1),
+(78, 45, 1, '74.70', 1),
+(79, 45, 2, '47.60', 1),
+(80, 45, 3, '39.23', 1),
+(81, 46, 1, '74.70', 1),
+(82, 46, 3, '39.23', 1),
+(83, 46, 2, '47.60', 1),
+(84, 47, 1, '74.70', 1),
+(85, 47, 3, '39.23', 1),
+(86, 47, 2, '47.60', 1),
+(87, 48, 9, '45.50', 2);
 
 -- --------------------------------------------------------
 
@@ -236,7 +304,8 @@ ALTER TABLE `ItemsFiles`
 --
 ALTER TABLE `Orders`
   ADD PRIMARY KEY (`Id`),
-  ADD UNIQUE KEY `UOrderId` (`UOrderId`);
+  ADD UNIQUE KEY `UOrderId` (`UOrderId`),
+  ADD KEY `ClientId` (`ClientId`);
 
 --
 -- Индексы таблицы `OrdersItems`
@@ -267,13 +336,13 @@ ALTER TABLE `Types`
 -- AUTO_INCREMENT для таблицы `Addresses`
 --
 ALTER TABLE `Addresses`
-  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT для таблицы `Clients`
 --
 ALTER TABLE `Clients`
-  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
 
 --
 -- AUTO_INCREMENT для таблицы `Items`
@@ -291,13 +360,13 @@ ALTER TABLE `ItemsFiles`
 -- AUTO_INCREMENT для таблицы `Orders`
 --
 ALTER TABLE `Orders`
-  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT для таблицы `OrdersItems`
 --
 ALTER TABLE `OrdersItems`
-  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=88;
 
 --
 -- AUTO_INCREMENT для таблицы `TypeFiles`
@@ -316,6 +385,12 @@ ALTER TABLE `Types`
 --
 
 --
+-- Ограничения внешнего ключа таблицы `Addresses`
+--
+ALTER TABLE `Addresses`
+  ADD CONSTRAINT `addresses_ibfk_1` FOREIGN KEY (`ClientId`) REFERENCES `Clients` (`Id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+--
 -- Ограничения внешнего ключа таблицы `Items`
 --
 ALTER TABLE `Items`
@@ -326,6 +401,12 @@ ALTER TABLE `Items`
 --
 ALTER TABLE `ItemsFiles`
   ADD CONSTRAINT `itemsfiles_ibfk_1` FOREIGN KEY (`ItemId`) REFERENCES `Items` (`Id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+--
+-- Ограничения внешнего ключа таблицы `Orders`
+--
+ALTER TABLE `Orders`
+  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`ClientId`) REFERENCES `Clients` (`Id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
 -- Ограничения внешнего ключа таблицы `OrdersItems`

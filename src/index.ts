@@ -26,9 +26,13 @@ app.get('/', (req: Request, res: Response) => {
 
     res.send(`Hello to server API. Your IP is: ${ip}`);
 });
+
 app.use('/items', itemsRouter);
 app.use('/types', typesRouter);
-app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
+app.use(
+    '/images',
+    express.static(path.join(__dirname, '..', 'public', 'images'))
+);
 app.use('/orders', ordersRouter);
 
 app.use((err, req: Request, res: Response, next: NextFunction) => {

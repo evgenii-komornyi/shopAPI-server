@@ -19,4 +19,5 @@ export enum OrderValidationErrors {
     POSTAL_CODE_INCORRECT_FORMAT = 'Postal code format is incorrect. Country do not have any matches.',
     EMPTY_ADDRESS = 'Address cannot be empty.',
     SPECIAL_CHARACTERS_NOT_ALLOWED = 'Address cannot contains any special characters.',
+    NO_SEARCH_CRITERIA = 'Invalid search criteria.',
 }

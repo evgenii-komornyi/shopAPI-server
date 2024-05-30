@@ -1,4 +1,4 @@
-import { OrderCreateRequest } from '../../entities/order/request/OrderCreateRequest.ts';
+import { OrderCreateRequest } from '../../models/requests/order/OrderCreateRequest.ts';
 import { DeliveryType } from '../../enums/DeliveryType.ts';
 import { countryIndex } from '../../helpers/validation.helper.ts';
 import { IValidatable } from '../IValidatable.ts';
@@ -10,7 +10,7 @@ const allLettersAndUnicodeFormat: RegExp = new RegExp(
     'u'
 );
 
-export class CreateRequestValidation
+export class CreateOrderRequestValidation
     implements IValidatable<OrderCreateRequest, OrderValidationErrors>
 {
     public validate(request: OrderCreateRequest): OrderValidationErrors[] {

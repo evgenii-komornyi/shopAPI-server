@@ -19,10 +19,18 @@ import {
 } from '../db/dbConnection.db.ts';
 
 import { OrderValidation } from '../validation/order/OrderValidation.ts';
-import { CreateRequestValidation } from '../validation/order/CreateOrderRequestValidation.ts';
+import { CreateOrderRequestValidation } from '../validation/order/CreateOrderRequestValidation.ts';
 import { OrderValidationErrors } from '../validation/errors/OrderValidationErrors.ts';
-import { OrderCreateRequest } from '../entities/order/request/OrderCreateRequest.ts';
+import { OrderCreateRequest } from '../models/requests/order/OrderCreateRequest.ts';
 import { DeliveryType } from '../enums/DeliveryType.ts';
+import { trim } from '../helpers/validation.helper.ts';
+import { FindOrderRequestValidation } from '../validation/order/FindOrderRequestValidation.ts';
+import { OrderFindRequest } from '../models/requests/order/OrderFindRequest.ts';
+
+const _validator = new OrderValidation(
+    new CreateOrderRequestValidation(),
+    new FindOrderRequestValidation()
+);
 
 export const createOrder = async (
     { body }: Request,
@@ -32,27 +40,25 @@ export const createOrder = async (
     let connection;
     const { email, firstName, lastName, phoneNumber } = body.client;
     const { deliveryType } = body.orderInfo;
-    const { country, city, postalCode, address } = body.address;
 
-    const validator = new OrderValidation(new CreateRequestValidation());
-
-    const orderCreateRequest = new OrderCreateRequest(
-        email,
-        firstName,
-        lastName,
-        phoneNumber,
-        deliveryType
-    );
+    const orderCreateRequest: OrderCreateRequest = new OrderCreateRequest();
+    orderCreateRequest.email = trim(email);
+    orderCreateRequest.firstName = trim(firstName);
+    orderCreateRequest.lastName = trim(lastName);
+    orderCreateRequest.phoneNumber = trim(phoneNumber);
+    orderCreateRequest.deliveryType = trim(deliveryType);
 
     if (deliveryType === DeliveryType.COURIER) {
-        orderCreateRequest.withCountry(country);
-        orderCreateRequest.withCity(city);
-        orderCreateRequest.withPostalCode(postalCode);
-        orderCreateRequest.withAddress(address);
+        const { country, city, postalCode, address } = body.address;
+
+        orderCreateRequest.country = trim(country);
+        orderCreateRequest.city = trim(city);
+        orderCreateRequest.postalCode = trim(postalCode);
+        orderCreateRequest.address = trim(address);
     }
 
     const validationErrors: OrderValidationErrors[] =
-        validator.$CreateRequestValidation.validate(orderCreateRequest);
+        _validator.$CreateOrderRequestValidation.validate(orderCreateRequest);
 
     if (validationErrors.length === 0) {
         try {
@@ -63,33 +69,33 @@ export const createOrder = async (
                 useLetters: false,
                 useNumbers: true,
             });
-            const clientId = await createNewClientAndGetClientId(
+            const clientId = await _createNewClientAndGetClientId(
                 body.client,
                 UClientId
             );
 
             let addressId = null;
 
-            if (body.orderInfo.deliveryType !== 'shop') {
-                addressId = await createNewAddressAndGetAddressId(
+            if (body.orderInfo.deliveryType !== DeliveryType.SHOP) {
+                addressId = await _createNewAddressAndGetAddressId(
                     body.address,
                     clientId
                 );
             }
 
             const UOrderId = generateUniqueId({ length: 9, useLetters: false });
-            const orderId = await createNewOrderAndGetOrderId(
+            const orderId = await _createNewOrderAndGetOrderId(
                 body.orderInfo,
                 addressId,
                 clientId,
                 UOrderId
             );
 
-            await createCartInOrder(body.cart, orderId);
+            await _createCartInOrder(body.cart, orderId);
 
             await commit(connection);
 
-            res.json({
+            res.status(200).json({
                 orderId: UOrderId,
                 clientId: UClientId,
             });
@@ -102,35 +108,53 @@ export const createOrder = async (
             next(err);
         }
     } else {
-        res.json({ validationErrors });
+        res.status(400).json({ error: 'Bad request. Check inputs.' });
     }
 };
 
 export const getOrderById = async (
-    { params: { clientId, orderId } }: Request,
+    req: Request,
     res: Response,
     next: NextFunction
-) => {
-    try {
-        const order = await readOrderById(orderId);
-        const items = await readItemsInOrderById(orderId);
+): Promise<void> => {
+    const {
+        params: { clientId, orderId },
+    }: Request = req;
 
-        res.json(generateOrderDTO(order, items));
-    } catch (error) {
-        res.json(error.message);
-        next(error);
+    const orderFindRequest: OrderFindRequest = new OrderFindRequest();
+    orderFindRequest.orderId = trim(orderId);
+    orderFindRequest.clientId = trim(clientId);
+
+    const validationErrors: OrderValidationErrors[] =
+        _validator.$FindOrderRequestValidation.validate(orderFindRequest);
+
+    if (validationErrors.length === 0) {
+        try {
+            const {
+                params: { orderId },
+            }: Request = req;
+            const order = await readOrderById(orderId);
+            const items = await readItemsInOrderById(orderId);
+
+            res.status(200).json(_generateOrderDTO(order, items));
+        } catch (error) {
+            res.json(error.message);
+            next(error);
+        }
+    } else {
+        res.status(400).json({ error: 'Bad request. Check inputs.' });
     }
 };
 
-const generateOrderDTO = (orderItems, items) => {
+const _generateOrderDTO = (orderItems, items) => {
     return {
         orderId: orderItems[0].UOrderId,
-        items: items.map(item => generateItemDTO(item)),
+        items: items.map(item => _generateItemDTO(item)),
         totalPrice: orderItems[0].TotalPrice,
     };
 };
 
-const generateItemDTO = item => {
+const _generateItemDTO = item => {
     return {
         itemName: item.ItemName,
         sex: item.Sex,
@@ -141,7 +165,7 @@ const generateItemDTO = item => {
     };
 };
 
-const createAndReturnId = async (createFunction, createParams) => {
+const _createAndReturnId = async (createFunction, createParams) => {
     try {
         const createdItem = await createFunction(createParams);
 
@@ -155,11 +179,11 @@ const createAndReturnId = async (createFunction, createParams) => {
     return null;
 };
 
-const createNewClientAndGetClientId = async (clientRequest, UClientId) => {
+const _createNewClientAndGetClientId = async (clientRequest, UClientId) => {
     const { firstName, lastName, email, phoneNumber } = clientRequest;
-    const creationDate = getCurrentDateTime();
+    const creationDate = _getCurrentDateTime();
 
-    const data = await createAndReturnId(createClientInDB, {
+    const data = await _createAndReturnId(createClientInDB, {
         firstName,
         lastName,
         email,
@@ -171,10 +195,10 @@ const createNewClientAndGetClientId = async (clientRequest, UClientId) => {
     return data;
 };
 
-const createNewAddressAndGetAddressId = async (addressRequest, clientId) => {
+const _createNewAddressAndGetAddressId = async (addressRequest, clientId) => {
     const { country, city, address, postalCode } = addressRequest;
 
-    return await createAndReturnId(createAddressInDB, {
+    return await _createAndReturnId(createAddressInDB, {
         country,
         city,
         address,
@@ -183,7 +207,7 @@ const createNewAddressAndGetAddressId = async (addressRequest, clientId) => {
     });
 };
 
-const createNewOrderAndGetOrderId = async (
+const _createNewOrderAndGetOrderId = async (
     orderRequest,
     deliveryAddressId,
     clientId,
@@ -191,9 +215,9 @@ const createNewOrderAndGetOrderId = async (
 ) => {
     const { deliveryType, deliveryComment, totalPrice } = orderRequest;
     const orderStatus = 'pending';
-    const orderDate = getCurrentDateTime();
+    const orderDate = _getCurrentDateTime();
 
-    return await createAndReturnId(createOrderInDB, {
+    return await _createAndReturnId(createOrderInDB, {
         UOrderId,
         clientId,
         deliveryAddressId,
@@ -205,9 +229,9 @@ const createNewOrderAndGetOrderId = async (
     });
 };
 
-const createCartInOrder = async (cart, orderId) => {
+const _createCartInOrder = async (cart, orderId) => {
     cart.map(({ itemId, actualPrice, quantity }) =>
-        createAndReturnId(createCartInOrderInDB, {
+        _createAndReturnId(createCartInOrderInDB, {
             orderId,
             itemId,
             itemPrice: actualPrice,
@@ -216,5 +240,5 @@ const createCartInOrder = async (cart, orderId) => {
     );
 };
 
-const getCurrentDateTime = () =>
+const _getCurrentDateTime = () =>
     new Date().toJSON().replace(/\..*$/, '').replace('T', ' ');

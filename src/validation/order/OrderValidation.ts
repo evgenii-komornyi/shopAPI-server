@@ -1,13 +1,23 @@
-import { CreateRequestValidation } from './CreateOrderRequestValidation.ts';
+import { CreateOrderRequestValidation } from './CreateOrderRequestValidation.ts';
+import { FindOrderRequestValidation } from './FindOrderRequestValidation.ts';
 
 export class OrderValidation {
-    private _CreateRequestValidation: CreateRequestValidation;
+    private _CreateOrderRequestValidation: CreateOrderRequestValidation;
+    private _FindOrderRequestValidation: FindOrderRequestValidation;
 
-    constructor(createRequestValidation: CreateRequestValidation) {
-        this._CreateRequestValidation = createRequestValidation;
+    constructor(
+        createRequestValidation: CreateOrderRequestValidation,
+        findOrderRequestValidation: FindOrderRequestValidation
+    ) {
+        this._CreateOrderRequestValidation = createRequestValidation;
+        this._FindOrderRequestValidation = findOrderRequestValidation;
     }
 
-    public get $CreateRequestValidation(): CreateRequestValidation {
-        return this._CreateRequestValidation;
+    public get $CreateOrderRequestValidation(): CreateOrderRequestValidation {
+        return this._CreateOrderRequestValidation;
+    }
+
+    public get $FindOrderRequestValidation(): FindOrderRequestValidation {
+        return this._FindOrderRequestValidation;
     }
 }

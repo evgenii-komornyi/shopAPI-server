@@ -7,3 +7,5 @@ const countryIndices: Record<string, number> = {
 export const countryIndex = (country: string): number => {
     return countryIndices[country] ?? -1;
 };
+
+export const trim = (valueToTrim: string) => valueToTrim.trim();

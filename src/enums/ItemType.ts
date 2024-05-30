@@ -1,0 +1,16 @@
+export enum ItemType {
+    HALF_MOON = 'Halfmoon',
+    KOI = 'Koi',
+    GIANT = 'Giant',
+    DUMBO = 'Dumbo',
+    WILD = 'Wild',
+    ALIEN = 'Alien',
+    DRAGON = 'Dragon',
+    SAMURAI = 'Samurai',
+    PLAKAT = 'Plakat',
+    CROWN_TAIL = 'Crowntail',
+    VEIL_TAIL = 'Veiltail',
+    TIGER = 'Tiger',
+    SPADE = 'Spade',
+    AVATAR = 'Avatar',
+}

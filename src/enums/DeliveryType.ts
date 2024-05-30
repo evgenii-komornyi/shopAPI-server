@@ -1,4 +1,4 @@
 export enum DeliveryType {
-    SHOP = 'Shop',
-    COURIER = 'Courier',
+    SHOP = 'shop',
+    COURIER = 'courier',
 }

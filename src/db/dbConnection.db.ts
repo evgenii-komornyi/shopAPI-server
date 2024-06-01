@@ -4,7 +4,7 @@ import {
     QueryOptions,
     QueryResult,
 } from 'mysql2/promise.js';
-import { config } from './config.ts';
+import { config } from '../configs/config.ts';
 
 export const closeConnection = async (
     connection: Connection
@@ -33,7 +33,7 @@ export const executeQuery = async (
     let connection;
 
     try {
-        connection = await createConnection(config.db);
+        connection = await createConnection(config.production.db);
 
         const [results] = await connection.execute(sql, params);
 

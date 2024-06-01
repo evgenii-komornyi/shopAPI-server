@@ -10,7 +10,7 @@ import {
 import { create as createClientInDB } from '../repositories/clients.repository.ts';
 import { create as createAddressInDB } from '../repositories/addresses.repository.ts';
 import { createConnection } from 'mysql2/promise.js';
-import { config } from '../db/config.ts';
+import { config } from '../configs/config.ts';
 import {
     closeConnection,
     commit,

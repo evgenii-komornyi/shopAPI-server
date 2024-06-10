@@ -9,3 +9,9 @@ export const countryIndex = (country: string): number => {
 };
 
 export const trim = (valueToTrim: string) => valueToTrim.trim();
+
+export const isNullOrEmpty = (value: string | null | undefined): boolean =>
+    value == null || value.length == 0;
+
+export const sanitize = (value: string): string =>
+    value && value.replace(/[<>]/g, '');

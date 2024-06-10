@@ -1,8 +1,8 @@
 import {
     createConnection,
     Connection,
-    QueryOptions,
     QueryResult,
+    ResultSetHeader,
 } from 'mysql2/promise.js';
 import { config } from '../configs/config.ts';
 
@@ -26,21 +26,17 @@ export const rollback = async (connection: Connection): Promise<void> => {
     if (connection) return await connection.rollback();
 };
 
-export const executeQuery = async (
-    sql: string,
-    params: QueryOptions[] = []
-): Promise<QueryResult[]> => {
+export const executeQuery = async (sql: string, params: any[] = []) => {
     let connection;
 
     try {
-        connection = await createConnection(config.production.db);
+        connection = await createConnection(config.development.db);
 
         const [results] = await connection.execute(sql, params);
 
         return results;
     } catch (error) {
-        console.error('Query error:', error);
-        return null;
+        throw new Error(error.sqlState);
     } finally {
         if (connection) {
             try {

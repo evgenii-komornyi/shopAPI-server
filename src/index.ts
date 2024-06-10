@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import itemsRouter from './routes/items.route.ts';
 import typesRouter from './routes/types.route.ts';
 import ordersRouter from './routes/orders.route.ts';
+import usersRouter from './routes/users.route.ts';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -34,6 +35,7 @@ app.use(
     express.static(path.join(__dirname, '..', 'public', 'images'))
 );
 app.use('/orders', ordersRouter);
+app.use('/api/v2/users', usersRouter);
 
 app.use((err, req: Request, res: Response, next: NextFunction) => {
     const statusCode = err.statusCode || 500;

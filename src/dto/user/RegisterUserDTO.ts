@@ -2,14 +2,14 @@ import { UserValidationErrors } from '../../validation/errors/UserValidationErro
 import { BasicDTO } from '../BasicDTO.ts';
 
 export class RegisterUserDTO extends BasicDTO<UserValidationErrors> {
-    private id: number;
-    private email: string;
-    private createdAt: Date;
-    private updatedAt: Date;
-    private lastLoginAt: Date | null;
-    private isActive: boolean;
-    private isVerified: boolean;
-    private uUserId: string;
+    protected id: number;
+    protected email: string;
+    protected createdAt: Date;
+    protected updatedAt: Date;
+    protected lastLoginAt: Date | null;
+    protected isActive: boolean;
+    protected isVerified: boolean;
+    protected uUserId: string;
 
     public set $id(id: number) {
         this.id = id;

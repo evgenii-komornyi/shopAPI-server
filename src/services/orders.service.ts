@@ -23,7 +23,7 @@ import { CreateOrderRequestValidation } from '../validation/order/CreateOrderReq
 import { OrderValidationErrors } from '../validation/errors/OrderValidationErrors.ts';
 import { OrderCreateRequest } from '../models/requests/order/OrderCreateRequest.ts';
 import { DeliveryType } from '../enums/DeliveryType.ts';
-import { trim } from '../helpers/validation.helper.ts';
+import { sanitize, trim } from '../helpers/validation.helper.ts';
 import { FindOrderRequestValidation } from '../validation/order/FindOrderRequestValidation.ts';
 import { OrderFindRequest } from '../models/requests/order/OrderFindRequest.ts';
 
@@ -42,19 +42,19 @@ export const createOrder = async (
     const { deliveryType } = body.orderInfo;
 
     const orderCreateRequest: OrderCreateRequest = new OrderCreateRequest();
-    orderCreateRequest.email = trim(email);
-    orderCreateRequest.firstName = trim(firstName);
-    orderCreateRequest.lastName = trim(lastName);
-    orderCreateRequest.phoneNumber = trim(phoneNumber);
-    orderCreateRequest.deliveryType = trim(deliveryType);
+    orderCreateRequest.email = sanitize(trim(email));
+    orderCreateRequest.firstName = sanitize(trim(firstName));
+    orderCreateRequest.lastName = sanitize(trim(lastName));
+    orderCreateRequest.phoneNumber = sanitize(trim(phoneNumber));
+    orderCreateRequest.deliveryType = sanitize(trim(deliveryType));
 
     if (deliveryType === DeliveryType.COURIER) {
         const { country, city, postalCode, address } = body.address;
 
-        orderCreateRequest.country = trim(country);
-        orderCreateRequest.city = trim(city);
-        orderCreateRequest.postalCode = trim(postalCode);
-        orderCreateRequest.address = trim(address);
+        orderCreateRequest.country = sanitize(trim(country));
+        orderCreateRequest.city = sanitize(trim(city));
+        orderCreateRequest.postalCode = sanitize(trim(postalCode));
+        orderCreateRequest.address = sanitize(trim(address));
     }
 
     const validationErrors: OrderValidationErrors[] =
@@ -62,7 +62,7 @@ export const createOrder = async (
 
     if (validationErrors.length === 0) {
         try {
-            connection = await createConnection(config.db);
+            connection = await createConnection(config.development.db);
             await startTransaction(connection);
             const UClientId = generateUniqueId({
                 length: 16,

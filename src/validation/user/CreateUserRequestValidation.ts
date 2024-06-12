@@ -1,7 +1,7 @@
 import { UserCreateRequest } from '../../models/requests/user/UserCreateRequest.ts';
 import { IValidatable } from '../IValidatable.ts';
 import { UserValidationErrors } from '../errors/UserValidationErrors.ts';
-import { isNullOrEmpty, sanitize } from '../../helpers/validation.helper.ts';
+import { isNullOrEmpty } from '../../helpers/validation.helper.ts';
 
 export class CreateUserRequestValidation
     implements IValidatable<UserCreateRequest, UserValidationErrors>
@@ -9,8 +9,8 @@ export class CreateUserRequestValidation
     public validate(request: UserCreateRequest): UserValidationErrors[] {
         const allErrors: UserValidationErrors[] = [];
 
-        allErrors.push(...this._validateEmail(sanitize(request.$Email)));
-        allErrors.push(...this._validatePassword(sanitize(request.$Password)));
+        allErrors.push(...this._validateEmail(request.$Email));
+        allErrors.push(...this._validatePassword(request.$Password));
 
         return allErrors;
     }

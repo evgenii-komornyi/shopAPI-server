@@ -6,4 +6,5 @@ export enum UserValidationErrors {
     PASSWORD_LENGTH_VIOLATION = 'Password has to have length from 8 to 100 length.',
     PASSWORD_INCORRECT_FORMAT = 'Password format is incorrect. Password has to contain at least one special symbol, capital letter and digit.',
     NO_SEARCH_CRITERIA = 'Invalid search criteria.',
+    USER_DOES_NOT_EXISTS = 'User, or password is incorrect.',
 }

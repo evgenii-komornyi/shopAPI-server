@@ -1,3 +1,3 @@
 import { UserBasicRequest } from './UserBasicRequest.ts';
 
-export class UserCreateRequest extends UserBasicRequest {}
+export class UserLoginRequest extends UserBasicRequest {}

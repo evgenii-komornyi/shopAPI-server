@@ -1,9 +1,3 @@
-import { RegisterUserDTO } from './RegisterUserDTO.ts';
+import { UserDTO } from './UserDTO.ts';
 
-export class LoginUserDTO extends RegisterUserDTO {
-    private token: string;
-
-    public set $token(token: string) {
-        this.token = token;
-    }
-}
+export class LoginUserDTO extends UserDTO {}

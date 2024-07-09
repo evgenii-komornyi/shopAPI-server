@@ -1,4 +1,3 @@
-import { sanitize } from '../../helpers/validation.helper.ts';
 import { User } from '../../models/User.ts';
 import { IValidatable } from '../IValidatable.ts';
 import { UserValidationErrors } from '../errors/UserValidationErrors.ts';

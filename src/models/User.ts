@@ -1,6 +1,7 @@
-export class User {
-    private Id: number;
-    private Email: string;
+import { Client } from './Client.ts';
+import { Person } from './Person.ts';
+
+export class User extends Person {
     private Password: string;
     private CreatedAt: Date;
     private UpdatedAt: Date;
@@ -8,6 +9,7 @@ export class User {
     private IsActive: boolean;
     private IsVerified: boolean;
     private UUserId: string;
+    private Client: Client;
 
     constructor(
         email: string,
@@ -15,26 +17,10 @@ export class User {
         uUserId: string,
         createdAt: Date
     ) {
-        this.Email = email;
+        super(email);
         this.Password = password;
         this.UUserId = uUserId;
         this.CreatedAt = createdAt;
-    }
-
-    public set id(id: number) {
-        this.Id = id;
-    }
-
-    public get $Id(): number {
-        return this.Id;
-    }
-
-    public set email(email: string) {
-        this.Email = email;
-    }
-
-    public get $Email(): string {
-        return this.Email;
     }
 
     public set password(password: string) {
@@ -91,5 +77,13 @@ export class User {
 
     public get $UUserId(): string {
         return this.UUserId;
+    }
+
+    public set client(client: Client) {
+        this.Client = client;
+    }
+
+    public get $Client(): Client {
+        return this.Client;
     }
 }

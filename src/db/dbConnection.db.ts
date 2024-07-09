@@ -21,16 +21,23 @@ export const rollback = async (connection: Connection): Promise<void> => {
     if (connection) return await connection.rollback();
 };
 
-export const executeQuery = async (sql: string, params: any[] = []) => {
+export const executeQuery = async (
+    sql: string,
+    params: any[] = [],
+    conn = undefined
+) => {
     let connection;
 
     try {
-        connection = await createConnection(config.development.db);
+        connection = conn
+            ? conn
+            : await createConnection(config.development.db);
 
         const [results] = await connection.execute(sql, params);
 
         return results;
     } catch (error) {
+        console.log(error);
         throw new Error(error.code);
     } finally {
         if (connection) {

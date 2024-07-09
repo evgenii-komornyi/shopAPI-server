@@ -2,24 +2,30 @@ import express, { Request, Response, Express, NextFunction } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 
 import itemsRouter from './routes/items.route.ts';
 import typesRouter from './routes/types.route.ts';
 import ordersRouter from './routes/orders.route.ts';
-import usersRouter from './routes/users.route.ts';
+import authRouter from './routes/auth.route.ts';
+import userRouter from './routes/users.route.ts';
+
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { JWTVerification } from './middlewares/JWTVerification.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app: Express = express();
+const _jwtVerification: JWTVerification = new JWTVerification();
 dotenv.config();
 
 app.use(
     bodyParser.json({ limit: '30mb', extended: true } as bodyParser.OptionsJson)
 );
 app.use(bodyParser.urlencoded({ limit: '30mb', extended: true }));
+app.use(cookieParser());
 app.use(cors());
 
 app.get('/', (req: Request, res: Response) => {
@@ -35,7 +41,10 @@ app.use(
     express.static(path.join(__dirname, '..', 'public', 'images'))
 );
 app.use('/orders', ordersRouter);
-app.use('/api/v2/users', usersRouter);
+app.use('/api/v2/auth', authRouter);
+
+app.use(_jwtVerification.verifyJWT);
+app.use('/api/v2/users', userRouter);
 
 app.use((err, req: Request, res: Response, next: NextFunction) => {
     const statusCode = err.statusCode || 500;

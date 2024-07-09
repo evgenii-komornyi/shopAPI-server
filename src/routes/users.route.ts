@@ -1,66 +1,39 @@
 import { Request, Response, Router } from 'express';
-import { UserService } from '../services/user/UserService.ts';
-import { IUserService } from '../services/user/IUserService.ts';
 import { UserRepository } from '../repositories/users/UserRepository.ts';
 import { UserValidation } from '../validation/user/UserValidation.ts';
-import { CreateUserRequestValidation } from '../validation/user/CreateUserRequestValidation.ts';
-import { UserCreateRequest } from '../models/requests/user/UserCreateRequest.ts';
-import { UserCreateResponse } from '../models/responses/user/UserCreateResponse.ts';
-import { RegisterUserDTO } from '../dto/user/RegisterUserDTO.ts';
 import { Status } from '../enums/Status.ts';
-import { UserLoginRequest } from '../models/requests/user/UserLoginRequest.ts';
-import { UserLoginResponse } from '../models/responses/user/UserLoginResponse.ts';
-import { LoginUserDTO } from '../dto/user/LoginUserDTO.ts';
-import { LoginUserValidation } from '../validation/user/LoginUserValidation.ts';
 import { sanitize, trim } from '../helpers/validation.helper.ts';
-
-const router: Router = Router();
+import { UserService } from '../services/user/UserService.ts';
+import { IUserService } from '../services/user/IUserService.ts';
+import { FindUserValidation } from '../validation/user/FindUserRequestValidation.ts';
+import { CreateUserRequestValidation } from '../validation/user/CreateUserRequestValidation.ts';
+import { LoginUserValidation } from '../validation/user/LoginUserValidation.ts';
+import { UserFindRequest } from '../models/requests/user/UserFindRequest.ts';
+import { UserFindResponse } from '../models/responses/user/UserFindResponse.ts';
+import { UserDTO } from '../dto/user/UserDTO.ts';
+import { User } from '../models/User.ts';
+import { UserDetailsDTO } from '../dto/user/UserDetailsDTO.ts';
+import { Client } from '../models/Client.ts';
+import { ClientDetailsDTO } from '../dto/client/ClientDetailsDTO.ts';
 
 const userService: IUserService = new UserService(
     new UserRepository(),
     new UserValidation(
         new CreateUserRequestValidation(),
-        new LoginUserValidation()
+        new LoginUserValidation(),
+        new FindUserValidation()
     )
 );
 
-router.post('/register', async (req: Request, res: Response) => {
-    const { email, password } = req.body;
+const router: Router = Router();
 
-    const userCreateRequest: UserCreateRequest = new UserCreateRequest();
-    userCreateRequest.email = sanitize(trim(email));
-    userCreateRequest.password = sanitize(trim(password));
-
-    try {
-        const userResponse: UserCreateResponse = await userService.registerUser(
-            userCreateRequest
-        );
-
-        if (userResponse) {
-            const registeredUserDTO: RegisterUserDTO =
-                _generateRegisteredUserDTO(userResponse);
-
-            return res.status(200).json({
-                registeredUser: registeredUserDTO,
-            });
-        }
-    } catch (error) {
-        console.error(error);
-
-        return res.status(500).json('External server error.');
-    }
-});
-
-router.post('/login', async (req: Request, res: Response) => {
-    const { email, password } = req.body;
-
-    const userLoginRequest: UserLoginRequest = new UserLoginRequest();
-    userLoginRequest.email = sanitize(trim(email));
-    userLoginRequest.password = sanitize(trim(password));
+router.get('/', async (req: Request, res: Response) => {
+    const userFindRequest: UserFindRequest = new UserFindRequest();
+    userFindRequest.userId = +sanitize(trim(String(req.body.userId)));
 
     try {
-        const userResponse: UserLoginResponse = await userService.loginUser(
-            userLoginRequest
+        const userResponse: UserFindResponse = await userService.getUserById(
+            userFindRequest
         );
 
         if (userResponse) {
@@ -70,10 +43,10 @@ router.post('/login', async (req: Request, res: Response) => {
             ) {
                 return res
                     .status(401)
-                    .json({ errors: _generateLoggedInUserDTO(userResponse) });
+                    .json({ errors: _generateUserDTO(userResponse) });
             } else {
                 return res.status(200).json({
-                    loggedInUser: _generateLoggedInUserDTO(userResponse),
+                    data: _generateUserDTO(userResponse),
                 });
             }
         }
@@ -84,61 +57,58 @@ router.post('/login', async (req: Request, res: Response) => {
     }
 });
 
-const _generateRegisteredUserDTO = (
-    userResponse: UserCreateResponse
-): RegisterUserDTO => {
-    const registeredUserDTO: RegisterUserDTO = new RegisterUserDTO();
+const _generateUserDTO = (userResponse: UserFindResponse): UserDTO => {
+    const userDTO: UserDTO = new UserDTO();
 
     if (
         userResponse.hasValidationErrors() ||
         userResponse.hasDatabaseErrors()
     ) {
-        registeredUserDTO.$status = Status.FAILED;
-        registeredUserDTO.$validationErrors = userResponse.$ValidationsErrors;
-        registeredUserDTO.$databaseErrors = userResponse.$DatabaseErrors;
+        userDTO.$status = Status.FAILED;
+        userDTO.$validationErrors = userResponse.$ValidationsErrors;
+        userDTO.$databaseErrors = userResponse.$DatabaseErrors;
     } else {
-        registeredUserDTO.$id = userResponse.$RegisteredUser.$Id;
-        registeredUserDTO.$email = userResponse.$RegisteredUser.$Email;
-        registeredUserDTO.$createAt = userResponse.$RegisteredUser.$CreatedAt;
-        registeredUserDTO.$updateAt = userResponse.$RegisteredUser.$UpdatedAt;
-        registeredUserDTO.$lastLoginAt =
-            userResponse.$RegisteredUser.$LastLoginAt;
-        registeredUserDTO.$isActive = userResponse.$RegisteredUser.$IsActive;
-        registeredUserDTO.$isVerified =
-            userResponse.$RegisteredUser.$IsVerified;
-        registeredUserDTO.$uUserId = userResponse.$RegisteredUser.$UUserId;
-        registeredUserDTO.$status = Status.SUCCESS;
+        userDTO.$user = _generateUserDetailsDTO(userResponse.$FoundUser);
     }
 
-    return registeredUserDTO;
+    return userDTO;
 };
 
-const _generateLoggedInUserDTO = (
-    userResponse: UserLoginResponse
-): LoginUserDTO => {
-    const loggedInUserDTO: LoginUserDTO = new LoginUserDTO();
+const _generateUserDetailsDTO = (
+    user: User,
+    token: string | undefined = undefined
+): UserDetailsDTO => {
+    const userDetailsDTO = new UserDetailsDTO();
 
-    if (
-        userResponse.hasValidationErrors() ||
-        userResponse.hasDatabaseErrors()
-    ) {
-        loggedInUserDTO.$status = Status.FAILED;
-        loggedInUserDTO.$validationErrors = userResponse.$ValidationsErrors;
-        loggedInUserDTO.$databaseErrors = userResponse.$DatabaseErrors;
-    } else {
-        loggedInUserDTO.$id = userResponse.$LoggedInUser.$Id;
-        loggedInUserDTO.$email = userResponse.$LoggedInUser.$Email;
-        loggedInUserDTO.$createAt = userResponse.$LoggedInUser.$CreatedAt;
-        loggedInUserDTO.$updateAt = userResponse.$LoggedInUser.$UpdatedAt;
-        loggedInUserDTO.$lastLoginAt = userResponse.$LoggedInUser.$LastLoginAt;
-        loggedInUserDTO.$isActive = userResponse.$LoggedInUser.$IsActive;
-        loggedInUserDTO.$isVerified = userResponse.$LoggedInUser.$IsVerified;
-        loggedInUserDTO.$uUserId = userResponse.$LoggedInUser.$UUserId;
-        loggedInUserDTO.$status = Status.SUCCESS;
-        loggedInUserDTO.$token = userResponse.$Token;
+    if (token) {
+        userDetailsDTO.$token = token;
     }
 
-    return loggedInUserDTO;
+    userDetailsDTO.$id = user.$Id;
+    userDetailsDTO.$email = user.$Email;
+    userDetailsDTO.$createAt = user.$CreatedAt;
+    userDetailsDTO.$updateAt = user.$UpdatedAt;
+    userDetailsDTO.$lastLoginAt = user.$LastLoginAt;
+    userDetailsDTO.$isActive = user.$IsActive;
+    userDetailsDTO.$isVerified = user.$IsVerified;
+    userDetailsDTO.$uUserId = user.$UUserId;
+    userDetailsDTO.$client = _generateClientDetailsDTO(user.$Client);
+
+    return userDetailsDTO;
+};
+
+const _generateClientDetailsDTO = (client: Client): ClientDetailsDTO => {
+    const clientDetailsDTO: ClientDetailsDTO = new ClientDetailsDTO();
+    clientDetailsDTO.$id = client.$Id;
+    clientDetailsDTO.$email = client.$Email;
+    clientDetailsDTO.$firstName = client.$FirstName;
+    clientDetailsDTO.$lastName = client.$LastName;
+    clientDetailsDTO.$phoneNumber = client.$PhoneNumber;
+    clientDetailsDTO.$creationDate = client.$CreationDate;
+    clientDetailsDTO.$updateDate = client.$UpdateDate;
+    clientDetailsDTO.$uClientId = client.$UClientId;
+
+    return clientDetailsDTO;
 };
 
 export default router;

@@ -1,9 +1,6 @@
-import { UserCreateRequest } from '../../models/requests/user/UserCreateRequest.ts';
-import { UserLoginRequest } from '../../models/requests/user/UserLoginRequest.ts';
-import { UserCreateResponse } from '../../models/responses/user/UserCreateResponse.ts';
-import { UserLoginResponse } from '../../models/responses/user/UserLoginResponse.ts';
+import { UserFindRequest } from '../../models/requests/user/UserFindRequest.ts';
+import { UserFindResponse } from '../../models/responses/user/UserFindResponse.ts';
 
 export interface IUserService {
-    registerUser(userRequest: UserCreateRequest): Promise<UserCreateResponse>;
-    loginUser(userRequest: UserLoginRequest): Promise<UserLoginResponse>;
+    getUserById(request: UserFindRequest): Promise<UserFindResponse>;
 }

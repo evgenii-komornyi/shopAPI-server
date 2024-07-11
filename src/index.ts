@@ -43,7 +43,7 @@ app.use(
 app.use('/orders', ordersRouter);
 app.use('/api/v2/auth', authRouter);
 
-app.use(_jwtVerification.verifyJWT);
+app.use(_jwtVerification.verifyUserJWT);
 app.use('/api/v2/users', userRouter);
 
 app.use((err, req: Request, res: Response, next: NextFunction) => {

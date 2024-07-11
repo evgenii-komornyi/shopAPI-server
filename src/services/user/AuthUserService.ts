@@ -16,6 +16,10 @@ import { ClientCreateRequest } from '../../models/requests/client/ClientCreateRe
 import { ClientValidationErrors } from '../../validation/errors/ClientValidationErrors.ts';
 import { RegisterResponse } from '../../models/responses/user/RegisterResponse.ts';
 import { ITransactionManager } from '../../managers/ITransactionManager.ts';
+import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 export class AuthUserService implements IAuthUserService {
     private readonly _userRepository: IUserRepository;
@@ -87,6 +91,10 @@ export class AuthUserService implements IAuthUserService {
                     client,
                     response
                 );
+
+                if (user) {
+                    await this._sendVerificationEmail(user.$Email, user.$Id);
+                }
             } catch (error) {
                 databaseErrors = handleException(error);
 
@@ -95,6 +103,16 @@ export class AuthUserService implements IAuthUserService {
         }
 
         return response;
+    }
+
+    public async verifyUser(userId: number, email: string): Promise<boolean> {
+        if (!this._userRepository.isUserExists(email, userId)) {
+            return false;
+        }
+
+        await this._userRepository.updateUserVerification(userId);
+
+        return true;
     }
 
     public async loginUser(
@@ -221,5 +239,45 @@ export class AuthUserService implements IAuthUserService {
         }
 
         return response;
+    }
+
+    private async _sendVerificationEmail(userEmail: string, userId: number) {
+        const emailToken = this._generateEmailToken(userEmail, userId);
+
+        const transporter = nodemailer.createTransport({
+            service: process.env.SERVICE,
+            auth: {
+                user: process.env.SENDER_EMAIL,
+                pass: process.env.SENDER_PASSWORD,
+            },
+        });
+
+        const verificationLink = `${process.env.VERIFICATION_DOMAIN}?emailToken=${emailToken}`;
+
+        const mailOptions = {
+            from: process.env.SENDER_EMAIL,
+            to: userEmail,
+            subject: 'Verify your email',
+            html: `Please click the following link to verify your email: <a href="${verificationLink}">${verificationLink}</a>`,
+        };
+
+        await transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log('Error:', error);
+            } else {
+                console.log('Email sent: ', info.response);
+            }
+        });
+    }
+
+    private _generateEmailToken(email: string, userId: number): string {
+        return jwt.sign(
+            {
+                userId,
+                email,
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
     }
 }

@@ -24,9 +24,11 @@ import { CreateClientRequestValidation } from '../validation/client/CreateClient
 import { RegisterResponse } from '../models/responses/user/RegisterResponse.ts';
 import { TransactionManager } from '../managers/TransactionManager.ts';
 import { RegisterDTO } from '../dto/register/RegisterDTO.ts';
+import { JWTVerification } from '../middlewares/JWTVerification.ts';
 
 const router: Router = Router();
 
+const _jwtVerification: JWTVerification = new JWTVerification();
 const authUserService: IAuthUserService = new AuthUserService(
     new UserRepository(),
     new UserValidation(
@@ -62,15 +64,35 @@ router.post('/register', async (req: Request, res: Response) => {
                 clientCreateRequest
             );
 
-        return res.status(200).json({
-            data: { ..._generateRegisterUserDTO(registerResponse) },
-        });
+        return res
+            .status(200)
+
+            .json({
+                data: { ..._generateRegisterUserDTO(registerResponse) },
+            });
     } catch (error) {
         console.error(error);
 
         return res.status(500).json('External server error.');
     }
 });
+
+router.get(
+    '/verify_email',
+    _jwtVerification.verifyEmailJWT,
+    (req: Request, res: Response) => {
+        if (authUserService.verifyUser(+req.body.userId, req.body.email)) {
+            return res.status(200).json({ status: Status.SUCCESS });
+        } else {
+            return res.status(200).json({
+                data: {
+                    status: Status.FAILED,
+                    errors: ['Token is not valid, or has expired.'],
+                },
+            });
+        }
+    }
+);
 
 router.post('/login', async (req: Request, res: Response) => {
     const { email, password } = req.body;
@@ -140,12 +162,8 @@ const _generateRegisterUserDTO = (response: RegisterResponse): RegisterDTO => {
         }
     } else {
         registerUserDTO.$status = Status.SUCCESS;
-        registerUserDTO.$user = _generateUserDetailsDTO(
-            response.$RegisteredUser
-        );
-        registerUserDTO.$client = _generateClientDetailsDTO(
-            response.$CreatedClient
-        );
+        registerUserDTO.$message =
+            'You are registered successfully! We sent you a link to your email. Please, verify your email to continue to use our services.';
     }
 
     return registerUserDTO;

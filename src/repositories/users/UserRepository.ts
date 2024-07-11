@@ -22,10 +22,28 @@ export class UserRepository implements IUserRepository {
         return user;
     }
 
-    public async isUserExists(email: string): Promise<boolean> {
+    public async updateUserVerification(userId: number): Promise<void> {
+        const userInDB = await executeQuery(`SELECT * FROM Users WHERE Id=?`, [
+            userId,
+        ]);
+
+        if (userInDB[0]) {
+            await executeQuery(`UPDATE Users SET IsVerified=? WHERE Id=?`, [
+                true,
+                userId,
+            ]);
+        }
+    }
+
+    public async isUserExists(
+        email: string,
+        userId: number | undefined = undefined
+    ): Promise<boolean> {
         const userInDB = await executeQuery(
-            `SELECT COUNT(*) AS Count FROM Users WHERE Email=?`,
-            [email]
+            !userId
+                ? `SELECT COUNT(*) AS Count FROM Users WHERE Email=?`
+                : `SELECT COUNT(*) AS Count FROM Users WHERE Id=? AND Email=?`,
+            !userId ? [email] : [userId, email]
         );
 
         return userInDB[0].Count != 0;

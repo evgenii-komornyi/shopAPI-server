@@ -120,7 +120,6 @@ export class AuthUserService implements IAuthUserService {
         try {
             const existingUser: User =
                 await this._userRepository.readUserByEmail(userRequest.$Email);
-            console.log(existingUser);
 
             const validationErrors: UserValidationErrors[] =
                 this._userValidation.$LoginUserValidation.validate(

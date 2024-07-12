@@ -9,6 +9,7 @@ export interface IAuthUserService {
         userRequest: UserCreateRequest,
         clientRequest: ClientCreateRequest
     ): Promise<RegisterResponse>;
+    sendVerificationEmail(email: string, userId: number): Promise<void>;
     verifyUser(userId: number, email: string): Promise<boolean>;
     loginUser(userRequest: UserLoginRequest): Promise<UserLoginResponse>;
 }

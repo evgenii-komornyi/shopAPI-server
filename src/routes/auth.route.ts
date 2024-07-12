@@ -64,6 +64,16 @@ router.post('/register', async (req: Request, res: Response) => {
                 clientCreateRequest
             );
 
+        if (
+            !registerResponse.hasDatabaseErrors() &&
+            !registerResponse.hasValidationErrors()
+        ) {
+            await authUserService.sendVerificationEmail(
+                registerResponse.$RegisteredUser.$Email,
+                registerResponse.$RegisteredUser.$Id
+            );
+        }
+
         return res
             .status(200)
 

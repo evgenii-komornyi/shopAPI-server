@@ -91,10 +91,6 @@ export class AuthUserService implements IAuthUserService {
                     client,
                     response
                 );
-
-                if (user) {
-                    await this._sendVerificationEmail(user.$Email, user.$Id);
-                }
             } catch (error) {
                 databaseErrors = handleException(error);
 
@@ -147,12 +143,9 @@ export class AuthUserService implements IAuthUserService {
 
                 response.token = token;
                 response.loggedInUser = existingUser;
-
-                console.log(response);
             }
         } catch (error) {
             databaseErrors = handleException(error);
-            console.log(error);
 
             response.databaseErrors = databaseErrors;
         }
@@ -241,7 +234,10 @@ export class AuthUserService implements IAuthUserService {
         return response;
     }
 
-    private async _sendVerificationEmail(userEmail: string, userId: number) {
+    public async sendVerificationEmail(
+        userEmail: string,
+        userId: number
+    ): Promise<void> {
         const emailToken = this._generateEmailToken(userEmail, userId);
 
         const transporter = nodemailer.createTransport({

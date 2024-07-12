@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Май 30 2024 г., 16:45
+-- Время создания: Июл 12 2024 г., 11:57
 -- Версия сервера: 8.0.30
 -- Версия PHP: 7.2.34
 
@@ -36,18 +36,6 @@ CREATE TABLE `Addresses` (
   `PostalCode` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---
--- Дамп данных таблицы `Addresses`
---
-
-INSERT INTO `Addresses` (`Id`, `ClientId`, `Country`, `City`, `Address`, `PostalCode`) VALUES
-(20, 67, 'Lithuania', 'Vilnus', 'Nava pr. 10', 'EU-5203'),
-(23, 72, 'Latvia', 'Riga', 'Kurzemes prospekts 10', 'LV-1069'),
-(24, 73, 'Lithuania', 'Vilnus', 'Nava pr. 10', 'EU-5203'),
-(25, 74, 'Lithuania', 'Vilnus', 'Nava pr. 10', 'EU-5203'),
-(26, 75, 'Lithuania', 'Vilnus', 'Nava pr. 10', 'EU-5203'),
-(27, 76, 'Lithuania', 'Vilnus', 'Nava pr. 10', 'EU-5203');
-
 -- --------------------------------------------------------
 
 --
@@ -57,28 +45,21 @@ INSERT INTO `Addresses` (`Id`, `ClientId`, `Country`, `City`, `Address`, `Postal
 CREATE TABLE `Clients` (
   `Id` int NOT NULL,
   `Email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `PhoneNumber` varchar(15) NOT NULL,
+  `PhoneNumber` varchar(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `CreationDate` datetime NOT NULL,
   `UpdateDate` datetime NOT NULL,
   `FirstName` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `LastName` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `UClientId` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL
+  `UClientId` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `UserId` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Дамп данных таблицы `Clients`
 --
 
-INSERT INTO `Clients` (`Id`, `Email`, `PhoneNumber`, `CreationDate`, `UpdateDate`, `FirstName`, `LastName`, `UClientId`) VALUES
-(67, 'test@test.test', '+669852114556', '2024-05-14 10:54:09', '2024-05-14 10:54:09', 'Test', 'Testov', '5949341030486182'),
-(68, 'blackdead666999@gmail.com', '25615015', '2024-05-15 13:48:19', '2024-05-15 13:48:19', 'Evgenii', 'Komornyi', '6920319108756100'),
-(69, 'blackdead666999@gmail.com', '25615015', '2024-05-16 07:50:39', '2024-05-16 07:50:39', 'Evgenii', 'Komornyi', '7067334726571925'),
-(72, 'blackdead666999@gmail.com', '+37125615015', '2024-05-23 12:53:13', '2024-05-23 12:53:13', 'Evgenii', 'Komornyi', '6043758673305800'),
-(73, 'test@test.test', '+669852114556', '2024-05-29 08:21:33', '2024-05-29 08:21:33', 'Test', 'Testov', '9271638288031502'),
-(74, 'test@test.test', '+669852114556', '2024-05-29 08:23:53', '2024-05-29 08:23:53', 'Test', 'Testov', '9444715654556702'),
-(75, 'test@test.test', '+669852114556', '2024-05-29 08:26:11', '2024-05-29 08:26:11', 'Test', 'Testov', '2215859638481371'),
-(76, 'test@test.test', '+669852114556', '2024-05-29 08:27:54', '2024-05-29 08:27:54', 'Test', 'Testov', '1034931860054593'),
-(77, 'test@tet.test', '+37125615015', '2024-05-30 12:10:08', '2024-05-30 12:10:08', 'Vasia', 'Pupkin', '0381093492489530');
+INSERT INTO `Clients` (`Id`, `Email`, `PhoneNumber`, `CreationDate`, `UpdateDate`, `FirstName`, `LastName`, `UClientId`, `UserId`) VALUES
+(107, 'evgeniikomornyi@gmail.com', '+37125615015', '2024-07-12 10:19:45', '2024-07-12 10:19:45', 'Evgenii', 'Komornyi', '8446444331902253', 152);
 
 -- --------------------------------------------------------
 
@@ -159,21 +140,6 @@ CREATE TABLE `Orders` (
   `UOrderId` varchar(12) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---
--- Дамп данных таблицы `Orders`
---
-
-INSERT INTO `Orders` (`Id`, `Status`, `OrderDate`, `ClientId`, `DeliveryAddressId`, `DeliveryComment`, `TotalPrice`, `DeliveryType`, `UOrderId`) VALUES
-(38, 'pending', '2024-05-14 10:54:09', 67, 20, 'Call me before delivery', '50.50', 'courier', '702150625'),
-(39, 'pending', '2024-05-15 13:48:19', 68, NULL, '', '78.43', 'shop', '563802416'),
-(40, 'pending', '2024-05-16 07:50:39', 69, NULL, '', '44.80', 'shop', '369316588'),
-(43, 'pending', '2024-05-23 12:53:13', 72, 23, '', '127.41', 'courier', '731580628'),
-(44, 'pending', '2024-05-29 08:21:33', 73, 24, 'Call me before delivery', '50.50', 'courier', '823026019'),
-(45, 'pending', '2024-05-29 08:23:53', 74, 25, 'Call me before delivery', '50.50', 'courier', '311365157'),
-(46, 'pending', '2024-05-29 08:26:11', 75, 26, 'Call me before delivery', '50.50', 'courier', '355495655'),
-(47, 'pending', '2024-05-29 08:27:54', 76, 27, 'Call me before delivery', '50.50', 'courier', '060479837'),
-(48, 'pending', '2024-05-30 12:10:08', 77, NULL, '', '91.00', 'shop', '930054097');
-
 -- --------------------------------------------------------
 
 --
@@ -187,32 +153,6 @@ CREATE TABLE `OrdersItems` (
   `ItemPrice` decimal(4,2) NOT NULL DEFAULT '0.00',
   `ItemQuantity` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Дамп данных таблицы `OrdersItems`
---
-
-INSERT INTO `OrdersItems` (`Id`, `OrderId`, `ItemId`, `ItemPrice`, `ItemQuantity`) VALUES
-(63, 38, 1, '74.70', 1),
-(64, 38, 3, '39.23', 1),
-(65, 38, 2, '47.60', 1),
-(66, 39, 3, '39.23', 1),
-(67, 39, 8, '39.20', 1),
-(68, 40, 7, '44.80', 1),
-(74, 43, 11, '42.47', 3),
-(75, 44, 2, '47.60', 1),
-(76, 44, 3, '39.23', 1),
-(77, 44, 1, '74.70', 1),
-(78, 45, 1, '74.70', 1),
-(79, 45, 2, '47.60', 1),
-(80, 45, 3, '39.23', 1),
-(81, 46, 1, '74.70', 1),
-(82, 46, 3, '39.23', 1),
-(83, 46, 2, '47.60', 1),
-(84, 47, 1, '74.70', 1),
-(85, 47, 3, '39.23', 1),
-(86, 47, 2, '47.60', 1),
-(87, 48, 9, '45.50', 2);
 
 -- --------------------------------------------------------
 
@@ -267,6 +207,31 @@ INSERT INTO `Types` (`Id`, `Name`, `Description`) VALUES
 (13, 'Spade', 'Discover Spade Tail Betta for sale at our online store. Explore a stunning selection of these graceful bettas and find your perfect aquatic companion. Shop now and bring home the beauty of these captivating Spade Tail Betta Fish!'),
 (14, 'Avatar', 'The Avatar Betta Fish, also know as the Black Star Betta, is a majestic aquatic marvel for your tank! With its vibrant, iridescent colors reminiscent of the mythical world, this betta fish embodies ethereal beauty. Its flowing fins and captivating hues create a stunning aquatic spectacle.');
 
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `Users`
+--
+
+CREATE TABLE `Users` (
+  `Id` int NOT NULL,
+  `Email` varchar(255) NOT NULL,
+  `Password` varchar(255) NOT NULL,
+  `CreatedAt` datetime NOT NULL,
+  `UpdatedAt` datetime NOT NULL,
+  `LastLoginAt` datetime DEFAULT NULL,
+  `IsActive` tinyint(1) NOT NULL DEFAULT '1',
+  `IsVerified` tinyint(1) NOT NULL DEFAULT '0',
+  `UUserId` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Дамп данных таблицы `Users`
+--
+
+INSERT INTO `Users` (`Id`, `Email`, `Password`, `CreatedAt`, `UpdatedAt`, `LastLoginAt`, `IsActive`, `IsVerified`, `UUserId`) VALUES
+(152, 'evgeniikomornyi@gmail.com', '$2b$10$mv7FaMAgnu3ACMsk/sClUehIYz3nECV1/ACuO39dgR9YjB5LnVhbu', '2024-07-12 10:19:45', '2024-07-12 10:19:45', '2024-07-12 10:35:10', 1, 1, 'mnvpgovj2ys623sd');
+
 --
 -- Индексы сохранённых таблиц
 --
@@ -283,7 +248,8 @@ ALTER TABLE `Addresses`
 --
 ALTER TABLE `Clients`
   ADD PRIMARY KEY (`Id`),
-  ADD UNIQUE KEY `UClientId` (`UClientId`);
+  ADD UNIQUE KEY `UClientId` (`UClientId`),
+  ADD KEY `UserId` (`UserId`);
 
 --
 -- Индексы таблицы `Items`
@@ -329,6 +295,14 @@ ALTER TABLE `Types`
   ADD PRIMARY KEY (`Id`);
 
 --
+-- Индексы таблицы `Users`
+--
+ALTER TABLE `Users`
+  ADD PRIMARY KEY (`Id`),
+  ADD UNIQUE KEY `UUserId` (`UUserId`),
+  ADD UNIQUE KEY `Email` (`Email`);
+
+--
 -- AUTO_INCREMENT для сохранённых таблиц
 --
 
@@ -342,7 +316,7 @@ ALTER TABLE `Addresses`
 -- AUTO_INCREMENT для таблицы `Clients`
 --
 ALTER TABLE `Clients`
-  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=108;
 
 --
 -- AUTO_INCREMENT для таблицы `Items`
@@ -381,6 +355,12 @@ ALTER TABLE `Types`
   MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
+-- AUTO_INCREMENT для таблицы `Users`
+--
+ALTER TABLE `Users`
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=153;
+
+--
 -- Ограничения внешнего ключа сохраненных таблиц
 --
 
@@ -389,6 +369,12 @@ ALTER TABLE `Types`
 --
 ALTER TABLE `Addresses`
   ADD CONSTRAINT `addresses_ibfk_1` FOREIGN KEY (`ClientId`) REFERENCES `Clients` (`Id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+--
+-- Ограничения внешнего ключа таблицы `Clients`
+--
+ALTER TABLE `Clients`
+  ADD CONSTRAINT `clients_ibfk_1` FOREIGN KEY (`UserId`) REFERENCES `Users` (`Id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
 -- Ограничения внешнего ключа таблицы `Items`

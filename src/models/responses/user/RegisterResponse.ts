@@ -1,13 +1,17 @@
+import { AddressValidationErrors } from '../../../validation/errors/AddressValidationErrors.ts';
 import { ClientValidationErrors } from '../../../validation/errors/ClientValidationErrors.ts';
 import { UserValidationErrors } from '../../../validation/errors/UserValidationErrors.ts';
+import { Address } from '../../Address.ts';
 import { Client } from '../../Client.ts';
 import { User } from '../../User.ts';
 
 export class RegisterResponse {
     private RegisteredUser: User;
     private CreatedClient: Client;
+    private ClientAddress: Address;
     private UserValidationErrors: UserValidationErrors[];
     private ClientValidationErrors: ClientValidationErrors[];
+    private AddressValidationErrors: AddressValidationErrors[];
     private DatabaseErrors: string[];
 
     public set registeredUser(user: User) {
@@ -26,12 +30,22 @@ export class RegisterResponse {
         return this.CreatedClient;
     }
 
+    public set clientAddress(address: Address) {
+        this.ClientAddress = address;
+    }
+
+    public get $ClientAddress(): Address {
+        return this.ClientAddress;
+    }
+
     public hasValidationErrors(): boolean {
         return (
             (this.UserValidationErrors &&
                 this.UserValidationErrors.length !== 0) ||
             (this.ClientValidationErrors &&
-                this.ClientValidationErrors.length !== 0)
+                this.ClientValidationErrors.length !== 0) ||
+            (this.AddressValidationErrors &&
+                this.AddressValidationErrors.length !== 0)
         );
     }
 
@@ -53,6 +67,14 @@ export class RegisterResponse {
 
     public get $ClientValidationErrors(): ClientValidationErrors[] {
         return this.ClientValidationErrors;
+    }
+
+    public set addressValidationErrors(errors: AddressValidationErrors[]) {
+        this.AddressValidationErrors = errors;
+    }
+
+    public get $AddressValidationErrors(): AddressValidationErrors[] {
+        return this.AddressValidationErrors;
     }
 
     public set databaseErrors(errors: string[]) {

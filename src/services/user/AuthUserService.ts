@@ -18,6 +18,10 @@ import { RegisterResponse } from '../../models/responses/user/RegisterResponse.t
 import { ITransactionManager } from '../../managers/ITransactionManager.ts';
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
+import { IAddressService } from '../address/IAddressService.ts';
+import { AddressCreateRequest } from '../../models/requests/address/AddressCreateRequest.ts';
+import { AddressValidationErrors } from '../../validation/errors/AddressValidationErrors.ts';
+import { Address } from '../../models/Address.ts';
 
 dotenv.config();
 
@@ -25,23 +29,27 @@ export class AuthUserService implements IAuthUserService {
     private readonly _userRepository: IUserRepository;
     private readonly _userValidation: UserValidation;
     private readonly _clientService: IClientService;
+    private readonly _addressService: IAddressService;
     private readonly _transactionManager: ITransactionManager;
 
     constructor(
         userRepository: IUserRepository,
         userValidation: UserValidation,
         clientService: IClientService,
+        addressService: IAddressService,
         transactionManager: ITransactionManager
     ) {
         this._userRepository = userRepository;
         this._userValidation = userValidation;
         this._clientService = clientService;
+        this._addressService = addressService;
         this._transactionManager = transactionManager;
     }
 
     public async registerUser(
         userRequest: UserCreateRequest,
-        clientRequest: ClientCreateRequest
+        clientRequest: ClientCreateRequest,
+        addressRequest: AddressCreateRequest
     ): Promise<RegisterResponse> {
         let response: RegisterResponse = new RegisterResponse();
 
@@ -53,11 +61,16 @@ export class AuthUserService implements IAuthUserService {
             this._clientService.$Validation.$CreateClientRequestValidation.validate(
                 clientRequest
             );
+        const addressValidationErrors: AddressValidationErrors[] =
+            this._addressService.$Validation.$CreateAddressRequestValidation.validate(
+                addressRequest
+            );
         let databaseErrors: string[] = [];
 
         if (
             userValidationErrors.length !== 0 ||
-            clientValidationErrors.length !== 0
+            clientValidationErrors.length !== 0 ||
+            addressValidationErrors.length !== 0
         ) {
             if (userValidationErrors.length !== 0) {
                 response.userValidationErrors = userValidationErrors;
@@ -72,6 +85,10 @@ export class AuthUserService implements IAuthUserService {
                           error => !error.includes('Email')
                       );
             }
+
+            if (addressValidationErrors.length !== 0) {
+                response.addressValidationErrors = addressValidationErrors;
+            }
         } else {
             const currentDateTime: Date = new Date();
 
@@ -85,10 +102,13 @@ export class AuthUserService implements IAuthUserService {
                 currentDateTime
             );
 
+            const address: Address = this._createAddressEntity(addressRequest);
+
             try {
                 response = await this._registerUserAndLinkClient(
                     user,
                     client,
+                    address,
                     response
                 );
             } catch (error) {
@@ -197,16 +217,29 @@ export class AuthUserService implements IAuthUserService {
         return client;
     }
 
+    private _createAddressEntity(
+        addressRequest: AddressCreateRequest
+    ): Address {
+        const address: Address = new Address();
+        address.country = addressRequest.$Country;
+        address.city = addressRequest.$City;
+        address.postalCode = addressRequest.$PostalCode;
+        address.address = addressRequest.$Address;
+
+        return address;
+    }
+
     private async _registerUserAndLinkClient(
         user: User,
         client: Client,
+        address: Address,
         response: RegisterResponse
     ): Promise<RegisterResponse> {
         try {
             await this._transactionManager.startTransaction();
             const connection = this._transactionManager.getConnection();
 
-            const createdUser =
+            const createdUser: User =
                 await this._userRepository.createUserWithConnection(
                     connection,
                     user
@@ -214,15 +247,23 @@ export class AuthUserService implements IAuthUserService {
 
             client.userId = createdUser.$Id;
 
-            const createdClient =
+            const createdClient: Client =
                 await this._clientService.linkClientWithUserWithConnection(
                     connection,
                     client
                 );
             createdUser.client = createdClient;
+            address.clientId = createdClient.$Id;
+
+            const createdAddress: Address =
+                await this._addressService.linkAddressWithClientWithConnection(
+                    connection,
+                    address
+                );
 
             response.registeredUser = createdUser;
             response.createdClient = createdClient;
+            response.clientAddress = createdAddress;
 
             await this._transactionManager.commit();
         } catch (error) {

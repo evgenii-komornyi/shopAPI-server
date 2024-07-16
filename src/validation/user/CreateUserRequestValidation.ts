@@ -1,7 +1,16 @@
 import { UserCreateRequest } from '../../models/requests/user/UserCreateRequest.ts';
 import { IValidatable } from '../IValidatable.ts';
 import { UserValidationErrors } from '../errors/UserValidationErrors.ts';
-import { isNullOrEmpty } from '../../helpers/validation.helper.ts';
+import {
+    countryIndex,
+    isNullOrEmpty,
+} from '../../helpers/validation.helper.ts';
+
+const unicodeLetterPattern: string = '[\\p{L}\\p{M}]';
+const allLettersAndUnicodeFormat: RegExp = new RegExp(
+    `^${unicodeLetterPattern}+$`,
+    'u'
+);
 
 export class CreateUserRequestValidation
     implements IValidatable<UserCreateRequest, UserValidationErrors>
@@ -33,7 +42,7 @@ export class CreateUserRequestValidation
     private _validatePassword(password: string): UserValidationErrors[] {
         const errorList: UserValidationErrors[] = [];
         const format: RegExp =
-            /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^*()_+\-=\[\]{};':"\\|,.<>\/?])[A-Za-z\d!@#$%^*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
+            /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};:,.?]).{8,100}$/;
 
         if (isNullOrEmpty(password)) {
             errorList.push(UserValidationErrors.EMPTY_PASSWORD);

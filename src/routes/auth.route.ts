@@ -25,6 +25,14 @@ import { RegisterResponse } from '../models/responses/user/RegisterResponse.ts';
 import { TransactionManager } from '../managers/TransactionManager.ts';
 import { RegisterDTO } from '../dto/register/RegisterDTO.ts';
 import { JWTVerification } from '../middlewares/JWTVerification.ts';
+import { AddressService } from '../services/address/AddressService.ts';
+import { AddressRepository } from '../repositories/address/AddressRepository.ts';
+import { AddressValidation } from '../validation/address/AddressValidation.ts';
+import { CreateAddressRequestValidation } from '../validation/address/CreateAddressRequestValidation.ts';
+import { AddressCreateRequest } from '../models/requests/address/AddressCreateRequest.ts';
+import { UserValidationErrors } from '../validation/errors/UserValidationErrors.ts';
+import { ClientValidationErrors } from '../validation/errors/ClientValidationErrors.ts';
+import { AddressValidationErrors } from '../validation/errors/AddressValidationErrors.ts';
 
 const router: Router = Router();
 
@@ -40,11 +48,25 @@ const authUserService: IAuthUserService = new AuthUserService(
         new ClientRepository(),
         new ClientValidation(new CreateClientRequestValidation())
     ),
+    new AddressService(
+        new AddressRepository(),
+        new AddressValidation(new CreateAddressRequestValidation())
+    ),
     new TransactionManager()
 );
 
 router.post('/register', async (req: Request, res: Response) => {
-    const { email, password, firstName, lastName, phoneNumber } = req.body;
+    const {
+        email,
+        password,
+        firstName,
+        lastName,
+        phoneNumber,
+        country,
+        city,
+        postalCode,
+        address,
+    } = req.body;
     const sanitizedTrimmedEmail = sanitize(trim(email));
 
     const userCreateRequest: UserCreateRequest = new UserCreateRequest();
@@ -57,11 +79,19 @@ router.post('/register', async (req: Request, res: Response) => {
     clientCreateRequest.lastName = sanitize(trim(lastName));
     clientCreateRequest.phoneNumber = sanitize(trim(phoneNumber));
 
+    const addressCreateRequest: AddressCreateRequest =
+        new AddressCreateRequest();
+    addressCreateRequest.country = sanitize(trim(country));
+    addressCreateRequest.city = sanitize(trim(city));
+    addressCreateRequest.postalCode = sanitize(trim(postalCode));
+    addressCreateRequest.address = sanitize(trim(address));
+
     try {
         const registerResponse: RegisterResponse =
             await authUserService.registerUser(
                 userCreateRequest,
-                clientCreateRequest
+                clientCreateRequest,
+                addressCreateRequest
             );
 
         if (
@@ -74,12 +104,9 @@ router.post('/register', async (req: Request, res: Response) => {
             );
         }
 
-        return res
-            .status(200)
-
-            .json({
-                data: { ..._generateRegisterUserDTO(registerResponse) },
-            });
+        return res.status(200).json({
+            data: { ..._generateRegisterUserDTO(registerResponse) },
+        });
     } catch (error) {
         console.error(error);
 
@@ -158,16 +185,22 @@ const _generateRegisterUserDTO = (response: RegisterResponse): RegisterDTO => {
         registerUserDTO.$status = Status.FAILED;
         registerUserDTO.$databaseErrors = response.$DatabaseErrors;
 
-        const userValidationErrors = response.$UserValidationErrors;
-        const clientValidationErrors = response.$ClientValidationErrors;
+        const userValidationErrors: UserValidationErrors[] =
+            response.$UserValidationErrors;
+        const clientValidationErrors: ClientValidationErrors[] =
+            response.$ClientValidationErrors;
+        const addressValidationErrors: AddressValidationErrors[] =
+            response.$AddressValidationErrors;
 
         if (
             userValidationErrors !== undefined ||
-            clientValidationErrors !== undefined
+            clientValidationErrors !== undefined ||
+            addressValidationErrors !== undefined
         ) {
             registerUserDTO.$validationErrors = [
                 ...(userValidationErrors ?? []),
                 ...(clientValidationErrors ?? []),
+                ...(addressValidationErrors ?? []),
             ];
         }
     } else {

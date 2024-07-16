@@ -1,3 +1,4 @@
+import { Address } from './Address.ts';
 import { Person } from './Person.ts';
 
 export class Client extends Person {
@@ -8,6 +9,7 @@ export class Client extends Person {
     private CreationDate: Date;
     private UpdateDate: Date;
     private UserId: number;
+    private Address: Address;
 
     public get $UClientId(): string {
         return this.UClientId;
@@ -63,5 +65,13 @@ export class Client extends Person {
 
     public set userId(userId: number) {
         this.UserId = userId;
+    }
+
+    public get $Address(): Address {
+        return this.Address;
+    }
+
+    public set address(address: Address) {
+        this.Address = address;
     }
 }

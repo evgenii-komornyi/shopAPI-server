@@ -5,13 +5,12 @@ export const create = async ({
     deliveryAddressId,
     deliveryType,
     deliveryComment,
-    totalPrice,
     orderDate,
     orderStatus,
     UOrderId,
 }) => {
     return await executeQuery(
-        `INSERT INTO Orders (UOrderId, Status, OrderDate, ClientId, DeliveryAddressId, DeliveryComment, TotalPrice, DeliveryType) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO Orders (UOrderId, Status, OrderDate, ClientId, DeliveryAddressId, DeliveryComment, DeliveryType) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         [
             UOrderId,
             orderStatus,
@@ -19,7 +18,6 @@ export const create = async ({
             clientId,
             deliveryAddressId,
             deliveryComment,
-            totalPrice,
             deliveryType,
         ]
     );
@@ -39,7 +37,7 @@ export const createCartInOrder = async ({
 
 export const readOrderById = async orderId => {
     return await executeQuery(
-        `SELECT o.UOrderId, o.TotalPrice
+        `SELECT o.UOrderId
             FROM OrdersItems as oi
         INNER JOIN Items as i
             ON oi.ItemId=i.Id

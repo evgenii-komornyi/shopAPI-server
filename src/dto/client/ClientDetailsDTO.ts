@@ -1,3 +1,5 @@
+import { AddressDetailsDTO } from '../address/AddressDetailsDTO.ts';
+
 export class ClientDetailsDTO {
     private id: number;
     private email: string;
@@ -7,6 +9,7 @@ export class ClientDetailsDTO {
     private uClientId: string;
     private creationDate: Date;
     private updateDate: Date;
+    private address: AddressDetailsDTO;
     private userId: number;
 
     public set $id(id: number) {
@@ -39,6 +42,10 @@ export class ClientDetailsDTO {
 
     public set $updateDate(updateDate: Date) {
         this.updateDate = updateDate;
+    }
+
+    public set $address(address: AddressDetailsDTO) {
+        this.address = address;
     }
 
     public set $userId(userId: number) {

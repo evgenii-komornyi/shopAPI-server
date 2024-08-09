@@ -3,10 +3,10 @@ import { DeliveryType } from '../../enums/DeliveryType.ts';
 import {
     countryIndex,
     isNullOrEmpty,
-    sanitize,
 } from '../../helpers/validation.helper.ts';
 import { IValidatable } from '../IValidatable.ts';
 import { OrderValidationErrors } from '../errors/OrderValidationErrors.ts';
+import { OrderItem } from '../../models/OrderItem.ts';
 
 const unicodeLetterPattern: string = '[\\p{L}\\p{M}]';
 const allLettersAndUnicodeFormat: RegExp = new RegExp(
@@ -20,30 +20,24 @@ export class CreateOrderRequestValidation
     public validate(request: OrderCreateRequest): OrderValidationErrors[] {
         const allErrors: OrderValidationErrors[] = [];
 
-        allErrors.push(...this._validateEmail(sanitize(request.$Email)));
-        allErrors.push(
-            ...this._validateFirstName(sanitize(request.$FirstName))
-        );
-        allErrors.push(...this._validateLastName(sanitize(request.$LastName)));
-        allErrors.push(
-            ...this._validatePhoneNumber(sanitize(request.$PhoneNumber))
-        );
+        allErrors.push(...this._validateEmail(request.$Email));
+        allErrors.push(...this._validateFirstName(request.$FirstName));
+        allErrors.push(...this._validateLastName(request.$LastName));
+        allErrors.push(...this._validatePhoneNumber(request.$PhoneNumber));
 
         if (request.$DeliveryType === DeliveryType.COURIER) {
-            allErrors.push(
-                ...this._validateCountry(sanitize(request.$Country))
-            );
-            allErrors.push(...this._validateCity(sanitize(request.$City)));
+            allErrors.push(...this._validateCountry(request.$Country));
+            allErrors.push(...this._validateCity(request.$City));
             allErrors.push(
                 ...this._validatePostalCode(
-                    sanitize(request.$PostalCode),
-                    sanitize(request.$Country)
+                    request.$PostalCode,
+                    request.$Country
                 )
             );
-            allErrors.push(
-                ...this._validateAddress(sanitize(request.$Address))
-            );
+            allErrors.push(...this._validateAddress(request.$Address));
         }
+
+        allErrors.push(...this._validateCart(request.$OrderItems));
 
         return allErrors;
     }
@@ -175,6 +169,32 @@ export class CreateOrderRequestValidation
             errorList.push(
                 OrderValidationErrors.SPECIAL_CHARACTERS_NOT_ALLOWED
             );
+        }
+
+        return errorList;
+    }
+
+    private _validateCart(orderItems: OrderItem[]): OrderValidationErrors[] {
+        const errorList: OrderValidationErrors[] = [];
+
+        if (!orderItems || orderItems.length === 0) {
+            errorList.push(OrderValidationErrors.NO_ITEMS);
+        } else {
+            orderItems.forEach(item => {
+                if (item.$ActualPrice <= 0) {
+                    errorList.push(OrderValidationErrors.NEGATIVE_PRICE);
+
+                    return;
+                }
+            });
+
+            orderItems.forEach(item => {
+                if (item.$Quantity <= 0) {
+                    errorList.push(OrderValidationErrors.NEGATIVE_QUANTITY);
+
+                    return;
+                }
+            });
         }
 
         return errorList;

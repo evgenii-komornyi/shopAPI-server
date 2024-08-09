@@ -5,6 +5,9 @@ import { AddressCreateResponse } from '../../models/responses/address/AddressCre
 import { AddressValidation } from '../../validation/address/AddressValidation.ts';
 import { IAddressService } from './IAddressService.ts';
 import { IAddressRepository } from '../../repositories/address/IAddressRepository.ts';
+import { AddressUpdateRequest } from '../../models/requests/address/AddressUpdateRequest.ts';
+import { AddressUpdateResponse } from '../../models/responses/address/AddressUpdateResponse.ts';
+import { AddressValidationErrors } from '../../validation/errors/AddressValidationErrors.ts';
 
 export class AddressService implements IAddressService {
     private readonly _repository: IAddressRepository;
@@ -34,6 +37,35 @@ export class AddressService implements IAddressService {
             console.log(error);
             throw error;
         }
+    }
+
+    public async updateAddress(
+        request: AddressUpdateRequest
+    ): Promise<AddressUpdateResponse> {
+        const response: AddressUpdateResponse = new AddressUpdateResponse();
+        const databaseErrors: string[] = [];
+        const validationErrors: AddressValidationErrors[] =
+            this._validation.$UpdateAddressRequestValidation.validate(request);
+
+        if (validationErrors.length !== 0) {
+            response.validationErrors = validationErrors;
+        } else {
+            try {
+                const address: Address = new Address();
+                address.id = request.$Id;
+                address.address = request.$Address;
+
+                const updatedAddress: Address =
+                    await this._repository.updateAddress(address);
+
+                response.updatedAddress = updatedAddress;
+            } catch (error) {
+                databaseErrors.push(error);
+                response.databaseErrors = databaseErrors;
+            }
+        }
+
+        return response;
     }
 
     public get $Validation(): AddressValidation {

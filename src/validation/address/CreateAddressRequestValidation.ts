@@ -1,17 +1,12 @@
 import {
     countryIndex,
     isNullOrEmpty,
-    sanitize,
 } from '../../helpers/validation.helper.ts';
 import { AddressCreateRequest } from '../../models/requests/address/AddressCreateRequest.ts';
 import { IValidatable } from '../IValidatable.ts';
 import { AddressValidationErrors } from '../errors/AddressValidationErrors.ts';
 
 const unicodeLetterPattern: string = '[\\p{L}\\p{M}]';
-const allLettersAndUnicodeFormat: RegExp = new RegExp(
-    `^${unicodeLetterPattern}+$`,
-    'u'
-);
 
 export class CreateAddressRequestValidation
     implements IValidatable<AddressCreateRequest, AddressValidationErrors>
@@ -97,7 +92,7 @@ export class CreateAddressRequestValidation
         if (isNullOrEmpty(address)) {
             errorList.push(AddressValidationErrors.EMPTY_ADDRESS);
         } else if (address && address?.length > 100) {
-            errorList.push(AddressValidationErrors.CITY_LENGTH_VIOLATION);
+            errorList.push(AddressValidationErrors.ADDRESS_LENGTH_VIOLATION);
         } else if (address && !format.test(address)) {
             errorList.push(
                 AddressValidationErrors.SPECIAL_CHARACTERS_NOT_ALLOWED

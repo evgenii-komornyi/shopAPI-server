@@ -33,6 +33,8 @@ import { AddressCreateRequest } from '../models/requests/address/AddressCreateRe
 import { UserValidationErrors } from '../validation/errors/UserValidationErrors.ts';
 import { ClientValidationErrors } from '../validation/errors/ClientValidationErrors.ts';
 import { AddressValidationErrors } from '../validation/errors/AddressValidationErrors.ts';
+import { UpdateClientRequestValidation } from '../validation/client/UpdateClientRequestValidation.ts';
+import { UpdateAddressRequestValidation } from '../validation/address/UpdateAddressRequestValidation.ts';
 
 const router: Router = Router();
 
@@ -46,11 +48,17 @@ const authUserService: IAuthUserService = new AuthUserService(
     ),
     new ClientService(
         new ClientRepository(),
-        new ClientValidation(new CreateClientRequestValidation())
+        new ClientValidation(
+            new CreateClientRequestValidation(),
+            new UpdateClientRequestValidation()
+        )
     ),
     new AddressService(
         new AddressRepository(),
-        new AddressValidation(new CreateAddressRequestValidation())
+        new AddressValidation(
+            new CreateAddressRequestValidation(),
+            new UpdateAddressRequestValidation()
+        )
     ),
     new TransactionManager()
 );
@@ -119,12 +127,11 @@ router.get(
     _jwtVerification.verifyEmailJWT,
     (req: Request, res: Response) => {
         if (authUserService.verifyUser(+req.body.userId, req.body.email)) {
-            return res.status(200).json({ status: Status.SUCCESS });
+            return res.status(200).json({ data: { status: Status.SUCCESS } });
         } else {
             return res.status(200).json({
                 data: {
                     status: Status.FAILED,
-                    errors: ['Token is not valid, or has expired.'],
                 },
             });
         }
@@ -132,11 +139,12 @@ router.get(
 );
 
 router.post('/login', async (req: Request, res: Response) => {
-    const { email, password } = req.body;
+    const { email, password, rememberMe } = req.body;
 
     const userLoginRequest: UserLoginRequest = new UserLoginRequest();
     userLoginRequest.email = sanitize(trim(email));
     userLoginRequest.password = sanitize(trim(password));
+    userLoginRequest.rememberMe = Boolean(sanitize(trim(String(rememberMe))));
 
     try {
         const userResponse: UserLoginResponse = await authUserService.loginUser(
@@ -148,21 +156,25 @@ router.post('/login', async (req: Request, res: Response) => {
                 userResponse.hasValidationErrors() ||
                 userResponse.hasDatabaseErrors()
             ) {
-                return res
-                    .status(401)
-                    .json({ errors: _generateLoggedInUserDTO(userResponse) });
+                return res.status(200).json({
+                    data: { ..._generateLoggedInUserDTO(userResponse) },
+                });
             } else {
-                let day = 24 * 60 * 60 * 1000;
+                const expDate = userLoginRequest.$RememberMe
+                    ? 365 * 24 * 60 * 60 * 1000
+                    : 24 * 60 * 60 * 1000;
 
                 return res
                     .status(200)
                     .cookie('token', userResponse.$Token, {
-                        maxAge: day,
+                        maxAge: expDate,
                         httpOnly: true,
                         sameSite: 'none',
                     })
                     .json({
-                        data: _generateLoggedInUserDTO(userResponse),
+                        data: {
+                            ..._generateLoggedInUserDTO(userResponse, expDate),
+                        },
                     });
             }
         }
@@ -175,7 +187,7 @@ router.post('/login', async (req: Request, res: Response) => {
 
 router.get('/logout', (req: Request, res: Response) => {
     req.body.userId = undefined;
-    return res.clearCookie('token').json({ status: Status.SUCCESS });
+    return res.clearCookie('token').json({ data: { status: Status.SUCCESS } });
 });
 
 const _generateRegisterUserDTO = (response: RegisterResponse): RegisterDTO => {
@@ -214,7 +226,8 @@ const _generateRegisterUserDTO = (response: RegisterResponse): RegisterDTO => {
 
 const _generateUserDetailsDTO = (
     user: User,
-    token: string | undefined = undefined,
+    token?: string,
+    exp?: number,
     withEmail: boolean = false
 ): UserDetailsDTO => {
     const userDetailsDTO = new UserDetailsDTO();
@@ -229,6 +242,10 @@ const _generateUserDetailsDTO = (
         userDetailsDTO.$email = user.$Email;
     }
 
+    if (exp) {
+        userDetailsDTO.$exp = exp;
+    }
+
     userDetailsDTO.$uUserId = user.$UUserId;
     userDetailsDTO.$client = _generateClientDetailsDTO(user.$Client);
 
@@ -236,7 +253,8 @@ const _generateUserDetailsDTO = (
 };
 
 const _generateLoggedInUserDTO = (
-    userResponse: UserLoginResponse
+    userResponse: UserLoginResponse,
+    expiresDate?: number
 ): LoginUserDTO => {
     const loggedInUserDTO: LoginUserDTO = new LoginUserDTO();
 
@@ -251,7 +269,8 @@ const _generateLoggedInUserDTO = (
         loggedInUserDTO.$status = Status.SUCCESS;
         loggedInUserDTO.$user = _generateUserDetailsDTO(
             userResponse.$LoggedInUser,
-            userResponse.$Token
+            userResponse.$Token,
+            expiresDate
         );
     }
 

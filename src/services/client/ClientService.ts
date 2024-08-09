@@ -8,6 +8,8 @@ import { ClientValidation } from '../../validation/client/ClientValidation.ts';
 import { ClientValidationErrors } from '../../validation/errors/ClientValidationErrors.ts';
 import { IClientService } from './IClientService.ts';
 import { Connection } from 'mysql2/promise';
+import { ClientUpdateResponse } from '../../models/responses/client/ClientUpdateResponse.ts';
+import { ClientUpdateRequest } from '../../models/requests/client/ClientUpdateRequest.ts';
 
 export class ClientService implements IClientService {
     private readonly _repository: IClientRepository;
@@ -71,6 +73,38 @@ export class ClientService implements IClientService {
         } catch (error) {
             throw error;
         }
+    }
+
+    public async updateClient(
+        request: ClientUpdateRequest
+    ): Promise<ClientUpdateResponse> {
+        const response: ClientUpdateResponse = new ClientUpdateResponse();
+        const databaseErrors: string[] = [];
+        const validationErrors: ClientValidationErrors[] =
+            this._validation.$UpdateClientRequestValidation.validate(request);
+
+        if (validationErrors.length !== 0) {
+            response.validationErrors = validationErrors;
+        } else {
+            try {
+                const client: Client = new Client('fakeemail');
+                client.id = request.$Id;
+                client.firstName = request.$FirstName;
+                client.lastName = request.$LastName;
+                client.phoneNumber = request.$PhoneNumber;
+                client.updateDate = new Date();
+
+                const updatedClient: Client =
+                    await this._repository.updateClient(client);
+
+                response.updatedClient = updatedClient;
+            } catch (error) {
+                databaseErrors.push(error);
+                response.databaseErrors = databaseErrors;
+            }
+        }
+
+        return response;
     }
 
     public get $Validation(): ClientValidation {

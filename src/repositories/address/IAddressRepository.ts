@@ -7,4 +7,5 @@ export interface IAddressRepository {
         connection: Connection,
         address: Address
     ): Promise<Address>;
+    updateAddress(address: Address): Promise<Address>;
 }

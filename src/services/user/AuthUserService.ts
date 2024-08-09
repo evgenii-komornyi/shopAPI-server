@@ -156,7 +156,7 @@ export class AuthUserService implements IAuthUserService {
                     },
                     process.env.JWT_SECRET,
                     {
-                        expiresIn: '1d',
+                        expiresIn: userRequest.$RememberMe ? '1y' : '1d',
                     }
                 );
 
@@ -288,7 +288,7 @@ export class AuthUserService implements IAuthUserService {
             },
         });
 
-        const verificationLink = `${process.env.VERIFICATION_DOMAIN}?emailToken=${emailToken}`;
+        const verificationLink = `${process.env.VERIFICATION_DOMAIN}/${emailToken}`;
 
         const mailOptions = {
             from: process.env.SENDER_EMAIL,

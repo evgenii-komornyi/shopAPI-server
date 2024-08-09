@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import { Status } from '../enums/Status.ts';
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ export class JWTVerification {
             if (err) {
                 return res.sendStatus(403);
             }
+
             req.body.userId = decoded.userId;
 
             next();
@@ -32,7 +34,7 @@ export class JWTVerification {
 
         if (!token) {
             return res.status(200).json({
-                data: { errors: ['Token is missing.'] },
+                data: { status: Status.FAILED, errors: ['Token is missing.'] },
             });
         }
 
@@ -44,7 +46,10 @@ export class JWTVerification {
             next();
         } catch (error) {
             return res.status(200).json({
-                data: { errors: ['Invalid or expired verification token.'] },
+                data: {
+                    status: Status.FAILED,
+                    errors: ['Invalid or expired verification token.'],
+                },
             });
         }
     }

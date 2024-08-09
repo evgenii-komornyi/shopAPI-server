@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Июл 12 2024 г., 11:57
+-- Время создания: Авг 09 2024 г., 11:31
 -- Версия сервера: 8.0.30
 -- Версия PHP: 7.2.34
 
@@ -36,6 +36,14 @@ CREATE TABLE `Addresses` (
   `PostalCode` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+--
+-- Дамп данных таблицы `Addresses`
+--
+
+INSERT INTO `Addresses` (`Id`, `ClientId`, `Country`, `City`, `Address`, `PostalCode`) VALUES
+(45, 138, 'Latvia', 'Riga', 'UzKurieniAcisSkatas 666', 'LV-1069'),
+(46, 139, 'Lithuania', 'Vilnus', 'Nava pr. 10', 'LT-10000');
+
 -- --------------------------------------------------------
 
 --
@@ -59,7 +67,9 @@ CREATE TABLE `Clients` (
 --
 
 INSERT INTO `Clients` (`Id`, `Email`, `PhoneNumber`, `CreationDate`, `UpdateDate`, `FirstName`, `LastName`, `UClientId`, `UserId`) VALUES
-(107, 'evgeniikomornyi@gmail.com', '+37125615015', '2024-07-12 10:19:45', '2024-07-12 10:19:45', 'Evgenii', 'Komornyi', '8446444331902253', 152);
+(134, 'blackdead666999@gmail.com', '+37125615015', '2024-07-17 08:46:40', '2024-07-17 08:46:40', 'Evgenii', 'Komornyi', '5971375685709703', NULL),
+(138, 'evgeniikomornyi@gmail.com', '+37125615015', '2024-07-18 14:32:37', '2024-07-26 15:34:25', 'Evgenii', 'Komornyi', '1586751010054704', 185),
+(139, 'test@test.test', '+669852114556', '2024-08-05 14:23:01', '2024-08-05 14:23:01', 'Test', 'Testov', '7635581333717668', NULL);
 
 -- --------------------------------------------------------
 
@@ -135,10 +145,19 @@ CREATE TABLE `Orders` (
   `ClientId` int NOT NULL,
   `DeliveryAddressId` int DEFAULT NULL,
   `DeliveryComment` varchar(100) DEFAULT NULL,
-  `TotalPrice` decimal(9,2) NOT NULL,
   `DeliveryType` varchar(255) NOT NULL,
   `UOrderId` varchar(12) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Дамп данных таблицы `Orders`
+--
+
+INSERT INTO `Orders` (`Id`, `Status`, `OrderDate`, `ClientId`, `DeliveryAddressId`, `DeliveryComment`, `DeliveryType`, `UOrderId`) VALUES
+(49, 'pending', '2024-07-17 08:46:40', 134, NULL, '', 'shop', '302791483'),
+(59, 'pending', '2024-08-04 17:15:57', 138, 45, 'Call me before delivery', 'courier', '664535716'),
+(64, 'pending', '2024-08-05 18:02:31', 138, 45, '', 'courier', '115348399'),
+(83, 'pending', '2024-08-05 21:08:27', 138, 45, 'Leave and run', 'courier', '970448215');
 
 -- --------------------------------------------------------
 
@@ -153,6 +172,21 @@ CREATE TABLE `OrdersItems` (
   `ItemPrice` decimal(4,2) NOT NULL DEFAULT '0.00',
   `ItemQuantity` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Дамп данных таблицы `OrdersItems`
+--
+
+INSERT INTO `OrdersItems` (`Id`, `OrderId`, `ItemId`, `ItemPrice`, `ItemQuantity`) VALUES
+(88, 49, 1, '74.70', 2),
+(104, 59, 1, '74.70', 1),
+(105, 59, 2, '47.60', 1),
+(106, 59, 3, '39.23', 1),
+(114, 64, 8, '39.20', 1),
+(115, 64, 10, '44.80', 1),
+(136, 83, 1, '74.70', 2),
+(137, 83, 2, '47.60', 1),
+(138, 83, 3, '39.23', 1);
 
 -- --------------------------------------------------------
 
@@ -230,7 +264,7 @@ CREATE TABLE `Users` (
 --
 
 INSERT INTO `Users` (`Id`, `Email`, `Password`, `CreatedAt`, `UpdatedAt`, `LastLoginAt`, `IsActive`, `IsVerified`, `UUserId`) VALUES
-(152, 'evgeniikomornyi@gmail.com', '$2b$10$mv7FaMAgnu3ACMsk/sClUehIYz3nECV1/ACuO39dgR9YjB5LnVhbu', '2024-07-12 10:19:45', '2024-07-12 10:19:45', '2024-07-12 10:35:10', 1, 1, 'mnvpgovj2ys623sd');
+(185, 'evgeniikomornyi@gmail.com', '$2b$10$SF6jyf1RnsOowo59CdUj4uVX2u77XmkZ.6IBUzx9SE1tJSqY8DnXm', '2024-07-18 14:32:37', '2024-07-18 14:32:37', '2024-08-07 19:42:55', 1, 1, 'd7gttyloup9q12jh');
 
 --
 -- Индексы сохранённых таблиц
@@ -310,13 +344,13 @@ ALTER TABLE `Users`
 -- AUTO_INCREMENT для таблицы `Addresses`
 --
 ALTER TABLE `Addresses`
-  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT для таблицы `Clients`
 --
 ALTER TABLE `Clients`
-  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=108;
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=140;
 
 --
 -- AUTO_INCREMENT для таблицы `Items`
@@ -334,13 +368,13 @@ ALTER TABLE `ItemsFiles`
 -- AUTO_INCREMENT для таблицы `Orders`
 --
 ALTER TABLE `Orders`
-  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=84;
 
 --
 -- AUTO_INCREMENT для таблицы `OrdersItems`
 --
 ALTER TABLE `OrdersItems`
-  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=88;
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=139;
 
 --
 -- AUTO_INCREMENT для таблицы `TypeFiles`
@@ -358,7 +392,7 @@ ALTER TABLE `Types`
 -- AUTO_INCREMENT для таблицы `Users`
 --
 ALTER TABLE `Users`
-  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=153;
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=187;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц

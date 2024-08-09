@@ -11,6 +11,7 @@ export class UserDetailsDTO {
     protected uUserId: string;
     protected client: ClientDetailsDTO;
     protected token: string;
+    protected exp: number;
 
     public set $id(id: number) {
         this.id = id;
@@ -50,5 +51,9 @@ export class UserDetailsDTO {
 
     public set $token(token: string) {
         this.token = token;
+    }
+
+    public set $exp(exp: number) {
+        this.exp = exp;
     }
 }

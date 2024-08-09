@@ -3,6 +3,7 @@ import { IUserRepository } from './IUserRepository.ts';
 import { executeQuery } from '../../db/dbConnection.db.ts';
 import { Connection } from 'mysql2/promise';
 import { Client } from '../../models/Client.ts';
+import { Address } from '../../models/Address.ts';
 
 export class UserRepository implements IUserRepository {
     public async createUser(user: User): Promise<User> {
@@ -66,10 +67,12 @@ export class UserRepository implements IUserRepository {
 
     public async readUserById(id: number): Promise<User> {
         const userInDB = await executeQuery(
-            `SELECT u.Id AS UserId, u.UUserID, u.Email, u.IsActive, u.IsVerified, u.LastLoginAt, u.CreatedAt, u.UpdatedAt, c.Id AS ClientId, c.FirstName, c.LastName, c.PhoneNumber, c.CreationDate, c.UpdateDate, c.UClientId
+            `SELECT u.Id AS UserId, u.UUserID, u.Email, u.IsActive, u.IsVerified, u.LastLoginAt, u.CreatedAt, u.UpdatedAt, c.Id AS ClientId, c.FirstName, c.LastName, c.PhoneNumber, c.CreationDate, c.UpdateDate, c.UClientId, a.Id AS AddressId, a.Country, a.City, a.PostalCode, a.Address, a.ClientId
                 FROM Users as u
                 INNER JOIN Clients AS c
                     ON c.UserId=u.Id
+                INNER JOIN Addresses as a
+                    ON a.ClientId=c.Id
                 WHERE u.Id=? AND u.IsActive=1 AND u.IsVerified=1`,
             [id]
         );
@@ -122,8 +125,22 @@ export class UserRepository implements IUserRepository {
         client.creationDate = userInDB.CreationDate;
         client.updateDate = userInDB.UpdatedDate;
         client.uClientId = userInDB.UClientId;
+        client.address = this._convertToAddress(userInDB);
+        client.userId = userInDB.UserId;
 
         return client;
+    }
+
+    private _convertToAddress(userInDB: any): Address {
+        const address: Address = new Address();
+        address.id = userInDB.AddressId;
+        address.country = userInDB.Country;
+        address.city = userInDB.City;
+        address.postalCode = userInDB.PostalCode;
+        address.address = userInDB.Address;
+        address.clientId = userInDB.ClientId;
+
+        return address;
     }
 
     private _updateLastLoginAt = async (email: string): Promise<void> => {

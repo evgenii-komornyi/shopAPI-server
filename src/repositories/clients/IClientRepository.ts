@@ -7,4 +7,5 @@ export interface IClientRepository {
         connection: Connection,
         client: Client
     ): Promise<Client>;
+    updateClient(client: Client): Promise<Client>;
 }

@@ -20,4 +20,8 @@ export enum OrderValidationErrors {
     EMPTY_ADDRESS = 'Address cannot be empty.',
     SPECIAL_CHARACTERS_NOT_ALLOWED = 'Address cannot contains any special characters.',
     NO_SEARCH_CRITERIA = 'Invalid search criteria.',
+    NO_ITEMS = 'Order items has not to be empty.',
+    NEGATIVE_PRICE = 'Negative price.',
+    NEGATIVE_QUANTITY = 'Negative quantity.',
+    ORDER_DOES_NOT_EXISTS = 'Order does not exist.',
 }

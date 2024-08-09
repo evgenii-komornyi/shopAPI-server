@@ -1,15 +1,27 @@
+import { OrderItem } from '../../OrderItem.ts';
 import { OrderBasicRequest } from './OrderBasicRequest.ts';
 
 export class OrderCreateRequest extends OrderBasicRequest {
+    private UserId?: number;
     private Email: string;
     private FirstName: string;
     private LastName: string;
     private PhoneNumber: string;
     private DeliveryType: string;
+    private DeliveryComment?: string;
     private Country?: string | null;
     private City?: string | null;
     private PostalCode?: string | null;
     private Address?: string | null;
+    private OrderItems: OrderItem[];
+
+    public set userId(userId: number) {
+        this.UserId = userId;
+    }
+
+    public get $UserId(): number {
+        return this.UserId;
+    }
 
     public set email(email: string) {
         this.Email = email;
@@ -51,6 +63,14 @@ export class OrderCreateRequest extends OrderBasicRequest {
         this.DeliveryType = deliveryType;
     }
 
+    public get $DeliveryComment(): string {
+        return this.DeliveryComment;
+    }
+
+    public set deliveryComment(deliveryComment: string) {
+        this.DeliveryComment = deliveryComment;
+    }
+
     public get $Country(): string | null | undefined {
         return this.Country;
     }
@@ -81,5 +101,13 @@ export class OrderCreateRequest extends OrderBasicRequest {
 
     public set address(address: string) {
         this.Address = address;
+    }
+
+    public get $OrderItems(): OrderItem[] {
+        return this.OrderItems;
+    }
+
+    public set orderItems(orderItems: OrderItem[]) {
+        this.OrderItems = orderItems;
     }
 }

@@ -9,6 +9,7 @@ import typesRouter from './routes/types.route.ts';
 import ordersRouter from './routes/orders.route.ts';
 import authRouter from './routes/auth.route.ts';
 import userRouter from './routes/users.route.ts';
+import secureOrderRouter from './routes/secureOrder.route.ts';
 
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -21,12 +22,18 @@ const app: Express = express();
 const _jwtVerification: JWTVerification = new JWTVerification();
 dotenv.config();
 
+const corsOptions = {
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+};
+
 app.use(
     bodyParser.json({ limit: '30mb', extended: true } as bodyParser.OptionsJson)
 );
 app.use(bodyParser.urlencoded({ limit: '30mb', extended: true }));
 app.use(cookieParser());
-app.use(cors());
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 app.get('/', (req: Request, res: Response) => {
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
@@ -45,6 +52,7 @@ app.use('/api/v2/auth', authRouter);
 
 app.use(_jwtVerification.verifyUserJWT);
 app.use('/api/v2/users', userRouter);
+app.use('/api/v2/orders', secureOrderRouter);
 
 app.use((err, req: Request, res: Response, next: NextFunction) => {
     const statusCode = err.statusCode || 500;

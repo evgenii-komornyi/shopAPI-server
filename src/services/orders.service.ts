@@ -26,6 +26,7 @@ import { DeliveryType } from '../enums/DeliveryType.ts';
 import { sanitize, trim } from '../helpers/validation.helper.ts';
 import { FindOrderRequestValidation } from '../validation/order/FindOrderRequestValidation.ts';
 import { OrderFindRequest } from '../models/requests/order/OrderFindRequest.ts';
+import { OrderItem } from '../models/OrderItem.ts';
 
 const _validator = new OrderValidation(
     new CreateOrderRequestValidation(),
@@ -39,7 +40,7 @@ export const createOrder = async (
 ): Promise<void> => {
     let connection;
     const { email, firstName, lastName, phoneNumber } = body.client;
-    const { deliveryType } = body.orderInfo;
+    const { deliveryType, deliveryComment } = body.orderInfo;
 
     const orderCreateRequest: OrderCreateRequest = new OrderCreateRequest();
     orderCreateRequest.email = sanitize(trim(email));
@@ -47,6 +48,8 @@ export const createOrder = async (
     orderCreateRequest.lastName = sanitize(trim(lastName));
     orderCreateRequest.phoneNumber = sanitize(trim(phoneNumber));
     orderCreateRequest.deliveryType = sanitize(trim(deliveryType));
+    orderCreateRequest.deliveryComment = sanitize(trim(deliveryComment));
+    orderCreateRequest.orderItems = _generateOrderItems(body.cart);
 
     if (deliveryType === DeliveryType.COURIER) {
         const { country, city, postalCode, address } = body.address;
@@ -112,6 +115,19 @@ export const createOrder = async (
     }
 };
 
+const _generateOrderItems = (cart: any[]): OrderItem[] => {
+    const orderItems: OrderItem[] = cart.map(item => {
+        const orderItem: OrderItem = new OrderItem();
+        orderItem.id = item.id;
+        orderItem.quantity = item.quantity;
+        orderItem.actualPrice = item.actualPrice;
+
+        return orderItem;
+    });
+
+    return orderItems;
+};
+
 export const getOrderById = async (
     req: Request,
     res: Response,
@@ -150,7 +166,6 @@ const _generateOrderDTO = (orderItems, items) => {
     return {
         orderId: orderItems[0].UOrderId,
         items: items.map(item => _generateItemDTO(item)),
-        totalPrice: orderItems[0].TotalPrice,
     };
 };
 
@@ -213,7 +228,7 @@ const _createNewOrderAndGetOrderId = async (
     clientId,
     UOrderId
 ) => {
-    const { deliveryType, deliveryComment, totalPrice } = orderRequest;
+    const { deliveryType, deliveryComment } = orderRequest;
     const orderStatus = 'pending';
     const orderDate = _getCurrentDateTime();
 
@@ -225,7 +240,6 @@ const _createNewOrderAndGetOrderId = async (
         deliveryComment,
         orderStatus,
         orderDate,
-        totalPrice,
     });
 };
 

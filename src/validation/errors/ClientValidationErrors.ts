@@ -1,4 +1,5 @@
 export enum ClientValidationErrors {
+    NO_SEARCH_CRITERIA = 'No search criteria.',
     EMPTY_EMAIL = 'Email cannot be empty.',
     EMAIL_LENGTH_VIOLATION = 'Email has to have length from 3 to 100.',
     EMAIL_INCORRECT_FORMAT = 'Email format is incorrect.',

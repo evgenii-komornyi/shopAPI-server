@@ -44,7 +44,8 @@ const _orderService: IOrderService = new OrderService(
 
 router.post('/', async (req: Request, res: Response) => {
     const { email, firstName, lastName, phoneNumber } = req.body.client;
-    const { deliveryType, deliveryComment } = req.body.orderInfo;
+    const { deliveryType, deliveryComment, deliveryPrice, deliveryCountry } =
+        req.body.orderInfo;
 
     const orderCreateRequest: OrderCreateRequest = new OrderCreateRequest();
     orderCreateRequest.userId = +sanitize(trim(String(req.body.userId)));
@@ -63,13 +64,14 @@ router.post('/', async (req: Request, res: Response) => {
         orderCreateRequest.city = sanitize(trim(city));
         orderCreateRequest.postalCode = sanitize(trim(postalCode));
         orderCreateRequest.address = sanitize(trim(address));
+        orderCreateRequest.deliveryPrice = sanitize(trim(deliveryPrice));
+        orderCreateRequest.deliveryCountry = sanitize(trim(deliveryCountry));
     }
 
     try {
         const orderResponse: OrderCreateResponse =
             await _orderService.createOrder(orderCreateRequest);
 
-        console.log(orderResponse);
         res.status(200).json({
             data: { ..._generateOrderDTO(orderResponse) },
         });
@@ -87,7 +89,6 @@ router.get('/:orderId', async (req: Request, res: Response) => {
             +req.params.orderId
         );
 
-        console.log(response);
         res.status(200).json({
             data: { ..._generateOrderFindDTO(response) },
         });

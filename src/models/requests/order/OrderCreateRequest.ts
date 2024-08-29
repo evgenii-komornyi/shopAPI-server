@@ -9,6 +9,8 @@ export class OrderCreateRequest extends OrderBasicRequest {
     private PhoneNumber: string;
     private DeliveryType: string;
     private DeliveryComment?: string;
+    private DeliveryPrice?: string;
+    private DeliveryCountry?: string;
     private Country?: string | null;
     private City?: string | null;
     private PostalCode?: string | null;
@@ -69,6 +71,22 @@ export class OrderCreateRequest extends OrderBasicRequest {
 
     public set deliveryComment(deliveryComment: string) {
         this.DeliveryComment = deliveryComment;
+    }
+
+    public get $DeliveryPrice(): string {
+        return this.DeliveryPrice;
+    }
+
+    public set deliveryPrice(deliveryPrice: string) {
+        this.DeliveryPrice = deliveryPrice;
+    }
+
+    public get $DeliveryCountry(): string {
+        return this.DeliveryCountry;
+    }
+
+    public set deliveryCountry(deliveryCountry: string) {
+        this.DeliveryCountry = deliveryCountry;
     }
 
     public get $Country(): string | null | undefined {

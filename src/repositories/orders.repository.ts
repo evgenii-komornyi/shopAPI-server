@@ -5,12 +5,14 @@ export const create = async ({
     deliveryAddressId,
     deliveryType,
     deliveryComment,
+    deliveryPrice,
+    deliveryCountry,
     orderDate,
     orderStatus,
     UOrderId,
 }) => {
     return await executeQuery(
-        `INSERT INTO Orders (UOrderId, Status, OrderDate, ClientId, DeliveryAddressId, DeliveryComment, DeliveryType) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO Orders (UOrderId, Status, OrderDate, ClientId, DeliveryAddressId, DeliveryComment, DeliveryType, DeliveryPrice, DeliveryCountry) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
             UOrderId,
             orderStatus,
@@ -19,6 +21,8 @@ export const create = async ({
             deliveryAddressId,
             deliveryComment,
             deliveryType,
+            deliveryPrice,
+            deliveryCountry,
         ]
     );
 };

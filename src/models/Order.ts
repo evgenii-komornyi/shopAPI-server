@@ -12,6 +12,8 @@ export class Order {
     private DeliveryAddressId?: number;
     private DeliveryComment: string;
     private DeliveryType: DeliveryType;
+    private DeliveryPrice?: string;
+    private DeliveryCountry?: string;
     private UOrderId: string;
     private Client: Client;
     private OrderItems: OrderItem[] | Item[];
@@ -70,6 +72,22 @@ export class Order {
 
     public set deliveryType(value: DeliveryType) {
         this.DeliveryType = value;
+    }
+
+    public get $DeliveryPrice(): string {
+        return this.DeliveryPrice;
+    }
+
+    public set deliveryPrice(value: string) {
+        this.DeliveryPrice = value;
+    }
+
+    public get $DeliveryCountry(): string {
+        return this.DeliveryCountry;
+    }
+
+    public set deliveryCountry(value: string) {
+        this.DeliveryCountry = value;
     }
 
     public get $UOrderId(): string {

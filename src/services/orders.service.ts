@@ -40,7 +40,8 @@ export const createOrder = async (
 ): Promise<void> => {
     let connection;
     const { email, firstName, lastName, phoneNumber } = body.client;
-    const { deliveryType, deliveryComment } = body.orderInfo;
+    const { deliveryType, deliveryComment, deliveryPrice, deliveryCountry } =
+        body.orderInfo;
 
     const orderCreateRequest: OrderCreateRequest = new OrderCreateRequest();
     orderCreateRequest.email = sanitize(trim(email));
@@ -58,6 +59,8 @@ export const createOrder = async (
         orderCreateRequest.city = sanitize(trim(city));
         orderCreateRequest.postalCode = sanitize(trim(postalCode));
         orderCreateRequest.address = sanitize(trim(address));
+        orderCreateRequest.deliveryPrice = sanitize(trim(deliveryPrice));
+        orderCreateRequest.deliveryCountry = sanitize(trim(deliveryCountry));
     }
 
     const validationErrors: OrderValidationErrors[] =
@@ -228,7 +231,8 @@ const _createNewOrderAndGetOrderId = async (
     clientId,
     UOrderId
 ) => {
-    const { deliveryType, deliveryComment } = orderRequest;
+    const { deliveryType, deliveryComment, deliveryPrice, deliveryCountry } =
+        orderRequest;
     const orderStatus = 'pending';
     const orderDate = _getCurrentDateTime();
 
@@ -238,6 +242,8 @@ const _createNewOrderAndGetOrderId = async (
         deliveryAddressId,
         deliveryType,
         deliveryComment,
+        deliveryPrice,
+        deliveryCountry,
         orderStatus,
         orderDate,
     });

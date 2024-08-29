@@ -14,7 +14,6 @@ import { Client } from '../../models/Client.ts';
 import { DeliveryType } from '../../enums/DeliveryType.ts';
 import { Item } from '../../models/Item.ts';
 import { OrderFindResponse } from '../../models/responses/order/OrderFindResponse.ts';
-import { response } from 'express';
 
 export class OrderService implements IOrderService {
     private readonly _orderRepository: IOrderRepository;
@@ -60,6 +59,14 @@ export class OrderService implements IOrderService {
                 order.status = OrderStatus.PENDING;
                 order.deliveryComment = orderRequest.$DeliveryComment;
                 order.deliveryType = orderRequest.$DeliveryType as DeliveryType;
+
+                if (
+                    orderRequest.$DeliveryPrice &&
+                    orderRequest.$DeliveryCountry
+                ) {
+                    order.deliveryPrice = orderRequest.$DeliveryPrice;
+                    order.deliveryCountry = orderRequest.$DeliveryCountry;
+                }
 
                 const isClientExists =
                     await this._orderRepository.isClientExists(

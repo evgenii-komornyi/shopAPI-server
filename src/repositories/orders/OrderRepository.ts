@@ -151,7 +151,7 @@ export class OrderRepository implements IOrderRepository {
         connection: Connection
     ): Promise<Order> {
         const [orderFromDB] = await connection.execute(
-            `SELECT UOrderId, Status, OrderDate, DeliveryType, DeliveryComment
+            `SELECT UOrderId, Status, OrderDate, DeliveryType, DeliveryComment, DeliveryPrice, DeliveryCountry
                 FROM Orders
             WHERE UOrderId=${orderId};`
         );
@@ -165,6 +165,8 @@ export class OrderRepository implements IOrderRepository {
         order.status = orderFormDB.Status;
         order.deliveryType = orderFormDB.DeliveryType;
         order.deliveryComment = orderFormDB.DeliveryComment;
+        order.deliveryPrice = orderFormDB.DeliveryPrice;
+        order.deliveryCountry = orderFormDB.DeliveryCountry;
 
         return order;
     }
@@ -213,7 +215,7 @@ export class OrderRepository implements IOrderRepository {
         connection: Connection = undefined
     ) {
         const queryWithParams = {
-            query: `INSERT INTO Orders (UOrderId, Status, OrderDate, ClientId, DeliveryAddressId, DeliveryComment, DeliveryType) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            query: `INSERT INTO Orders (UOrderId, Status, OrderDate, ClientId, DeliveryAddressId, DeliveryComment, DeliveryType, DeliveryPrice, DeliveryCountry) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             params: [
                 order.$UOrderId,
                 order.$Status,
@@ -222,6 +224,8 @@ export class OrderRepository implements IOrderRepository {
                 order.$DeliveryAddressId,
                 order.$DeliveryComment,
                 order.$DeliveryType,
+                order.$DeliveryPrice,
+                order.$DeliveryCountry,
             ],
         };
 

@@ -62,7 +62,22 @@ export class UserRepository implements IUserRepository {
             [email]
         );
 
-        return userInDB[0] ? this._convertToUser(userInDB[0]) : null;
+        return this._convertUserWithRoles(userInDB[0]);
+    }
+
+    private async _convertUserWithRoles(userInDB: any): Promise<User> {
+        if (userInDB) {
+            const user: User = this._convertToUser(userInDB);
+
+            const rolesInDB: any[] = await this._readUserRoles(user.$Id);
+
+            const roles: string[] = rolesInDB.map(role => role.Role);
+            user.roles = roles;
+
+            return user;
+        }
+
+        return null;
     }
 
     public async readUserById(id: number): Promise<User> {
@@ -77,7 +92,7 @@ export class UserRepository implements IUserRepository {
             [id]
         );
 
-        return userInDB[0] ? this._convertToUser(userInDB[0]) : null;
+        return this._convertUserWithRoles(userInDB[0]);
     }
 
     private async _insertUser(
@@ -114,6 +129,21 @@ export class UserRepository implements IUserRepository {
         user.client = this._convertToClient(userInDB);
 
         return user;
+    }
+
+    private async _readUserRoles(userId: number) {
+        const roles = await executeQuery(
+            `SELECT ur.RoleId, r.Role
+                    FROM UserRole AS ur
+                INNER JOIN Roles AS r
+                    ON ur.RoleId = r.Id
+                INNER JOIN Users AS u
+                    ON u.Id = ur.UserId
+                WHERE u.Id = ?;`,
+            [userId]
+        );
+
+        return roles;
     }
 
     private _convertToClient(userInDB: any): Client {

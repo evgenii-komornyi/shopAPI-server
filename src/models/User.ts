@@ -9,6 +9,7 @@ export class User extends Person {
     private IsActive: boolean;
     private IsVerified: boolean;
     private UUserId: string;
+    private Roles: string[];
     private Client: Client;
 
     constructor(
@@ -77,6 +78,14 @@ export class User extends Person {
 
     public get $UUserId(): string {
         return this.UUserId;
+    }
+
+    public set roles(roles: string[]) {
+        this.Roles = roles;
+    }
+
+    public get $Roles() {
+        return this.Roles;
     }
 
     public set client(client: Client) {

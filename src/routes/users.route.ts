@@ -158,6 +158,7 @@ const _generateUserDetailsDTO = (
     userDetailsDTO.$isActive = user.$IsActive;
     userDetailsDTO.$isVerified = user.$IsVerified;
     userDetailsDTO.$uUserId = user.$UUserId;
+    userDetailsDTO.$roles = user.$Roles;
     userDetailsDTO.$client = _generateClientDetailsDTO(user.$Client);
 
     return userDetailsDTO;

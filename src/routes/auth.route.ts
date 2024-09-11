@@ -247,6 +247,7 @@ const _generateUserDetailsDTO = (
     }
 
     userDetailsDTO.$uUserId = user.$UUserId;
+    userDetailsDTO.$roles = user.$Roles;
     userDetailsDTO.$client = _generateClientDetailsDTO(user.$Client);
 
     return userDetailsDTO;

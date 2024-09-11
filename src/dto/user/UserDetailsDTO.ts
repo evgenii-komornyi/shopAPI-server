@@ -9,6 +9,7 @@ export class UserDetailsDTO {
     protected isActive: boolean;
     protected isVerified: boolean;
     protected uUserId: string;
+    protected roles: string[];
     protected client: ClientDetailsDTO;
     protected token: string;
     protected exp: number;
@@ -43,6 +44,10 @@ export class UserDetailsDTO {
 
     public set $uUserId(uUserId: string) {
         this.uUserId = uUserId;
+    }
+
+    public set $roles(roles: string[]) {
+        this.roles = roles;
     }
 
     public set $client(client: ClientDetailsDTO) {

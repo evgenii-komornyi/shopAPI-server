@@ -187,6 +187,7 @@ router.post('/login', async (req: Request, res: Response) => {
 
 router.get('/logout', (req: Request, res: Response) => {
     req.body.userId = undefined;
+    req.body.roles = undefined;
     return res.clearCookie('token').json({ data: { status: Status.SUCCESS } });
 });
 

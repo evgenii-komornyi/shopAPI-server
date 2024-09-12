@@ -20,6 +20,7 @@ export class JWTVerification {
             }
 
             req.body.userId = decoded.userId;
+            req.body.roles = decoded.roles;
 
             next();
         });

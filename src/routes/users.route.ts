@@ -75,7 +75,7 @@ router.get('/', async (req: Request, res: Response) => {
         );
 
         return res.status(200).json({
-            data: { ..._generateUserDTO(userResponse) },
+            data: { ..._generateUserDTO(userResponse, req) },
         });
     } catch (error) {
         console.error(error);
@@ -122,7 +122,10 @@ router.patch('/address/:id', async (req: Request, res: Response) => {
     }
 });
 
-const _generateUserDTO = (userResponse: UserFindResponse): UserDTO => {
+const _generateUserDTO = (
+    userResponse: UserFindResponse,
+    req: Request = undefined
+): UserDTO => {
     const userDTO: UserDTO = new UserDTO();
 
     if (
@@ -134,7 +137,13 @@ const _generateUserDTO = (userResponse: UserFindResponse): UserDTO => {
         userDTO.$databaseErrors = userResponse.$DatabaseErrors;
     } else {
         userDTO.$status = Status.SUCCESS;
-        userDTO.$user = _generateUserDetailsDTO(userResponse.$FoundUser);
+        const foundUser: User = userResponse.$FoundUser;
+
+        if (req) {
+            foundUser.roles = req.body.roles;
+        }
+
+        userDTO.$user = _generateUserDetailsDTO(foundUser);
     }
 
     return userDTO;

@@ -92,7 +92,7 @@ export class UserRepository implements IUserRepository {
             [id]
         );
 
-        return this._convertUserWithRoles(userInDB[0]);
+        return this._convertToUser(userInDB[0]);
     }
 
     private async _insertUser(

@@ -153,6 +153,7 @@ export class AuthUserService implements IAuthUserService {
                 const token = jwt.sign(
                     {
                         userId: existingUser.$Id,
+                        roles: existingUser.$Roles,
                     },
                     process.env.JWT_SECRET,
                     {

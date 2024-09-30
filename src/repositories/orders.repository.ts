@@ -8,14 +8,14 @@ export const create = async ({
     deliveryPrice,
     deliveryCountry,
     orderDate,
-    orderStatus,
+    orderStatusId,
     UOrderId,
 }) => {
     return await executeQuery(
-        `INSERT INTO Orders (UOrderId, Status, OrderDate, ClientId, DeliveryAddressId, DeliveryComment, DeliveryType, DeliveryPrice, DeliveryCountry) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO Orders (UOrderId, StatusId, OrderDate, ClientId, DeliveryAddressId, DeliveryComment, DeliveryType, DeliveryPrice, DeliveryCountry) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
             UOrderId,
-            orderStatus,
+            orderStatusId,
             orderDate,
             clientId,
             deliveryAddressId,

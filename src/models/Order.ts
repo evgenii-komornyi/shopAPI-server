@@ -7,7 +7,8 @@ import { OrderItem } from './OrderItem.ts';
 export class Order {
     private Id: number;
     private ClientId: number;
-    private Status: OrderStatus;
+    private StatusId: OrderStatus;
+    private Status: string;
     private OrderDate: Date;
     private DeliveryAddressId?: number;
     private DeliveryComment: string;
@@ -34,11 +35,19 @@ export class Order {
         this.ClientId = value;
     }
 
-    public get $Status(): OrderStatus {
+    public get $StatusId(): OrderStatus {
+        return this.StatusId;
+    }
+
+    public set statusId(value: OrderStatus) {
+        this.StatusId = value;
+    }
+
+    public get $Status(): string {
         return this.Status;
     }
 
-    public set status(value: OrderStatus) {
+    public set status(value: string) {
         this.Status = value;
     }
 

@@ -24,4 +24,6 @@ export enum OrderValidationErrors {
     NEGATIVE_PRICE = 'Negative price.',
     NEGATIVE_QUANTITY = 'Negative quantity.',
     ORDER_DOES_NOT_EXISTS = 'Order does not exist.',
+    EMPTY_ORDER_STATUS = 'Order status cannot be empty.',
+    INVALID_ORDER_STATUS = 'Such status is not allowed.',
 }

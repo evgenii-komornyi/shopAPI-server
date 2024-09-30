@@ -20,29 +20,20 @@ export class OrderRepository implements IOrderRepository {
         order: Order,
         connection: Connection
     ): Promise<Order> {
-        const [createdOrder] = await this._insertOrder(order, connection);
-        order.id = createdOrder.insertId;
+        try {
+            const [createdOrder] = await this._insertOrder(order, connection);
+            order.id = createdOrder.insertId;
 
-        await this._insertCartInOrderItems(
-            order.$OrderItems,
-            order.$Id,
-            connection
-        );
-
-        return order;
-    }
-
-    private async _insertCartInOrderItems(
-        orderItems: OrderItem[] | Item[],
-        orderId: number,
-        connection: Connection
-    ): Promise<void> {
-        orderItems.forEach(async item => {
-            await connection.execute(
-                `INSERT INTO OrdersItems (OrderId, ItemId, ItemPrice, ItemQuantity) VALUES (?, ?, ?, ?)`,
-                [orderId, item.$Id, item.$ActualPrice, item.$Quantity]
+            await this._insertCartInOrderItems(
+                order.$OrderItems,
+                order.$Id,
+                connection
             );
-        });
+
+            return order;
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     // public async createCartInOrder(
@@ -108,6 +99,69 @@ export class OrderRepository implements IOrderRepository {
         return client;
     }
 
+    public async readOrderInfoByUserId(
+        userId: number,
+        connection: Connection
+    ): Promise<number> {
+        const [orderInfoFromDB] = await connection.execute(
+            `SELECT o.UOrderId FROM Clients AS c 
+            INNER JOIN Orders as o
+                ON o.ClientId=c.Id
+            WHERE c.UserId=${userId}`
+        );
+
+        return orderInfoFromDB[0].UOrderId;
+    }
+
+    public async readOrderById(
+        orderId: number,
+        connection: Connection
+    ): Promise<Order> {
+        const [orderFromDB] = await connection.execute(
+            `SELECT o.UOrderId, s.Status, o.OrderDate, o.DeliveryType, o.DeliveryComment, o.DeliveryPrice, o.DeliveryCountry
+                FROM Orders as o
+            INNER JOIN Status as s
+                ON o.StatusId=s.Id
+            WHERE UOrderId=${orderId};`
+        );
+
+        return this._createOrder(orderFromDB[0]);
+    }
+
+    public async readItemsInOrderById(
+        orderId: number,
+        connection: Connection
+    ): Promise<Item[]> {
+        const [itemsInOrderFromDB] = await connection.execute(
+            `SELECT i.Id, i.Name as ItemName, i.Sex, oi.ItemPrice, t.Name as Type, ifs.FileName, oi.ItemQuantity as Quantity
+                FROM OrdersItems as oi
+            INNER JOIN Items as i
+                ON oi.ItemId=i.Id
+            INNER JOIN Orders as o
+                ON oi.OrderId=o.Id
+            INNER JOIN ItemsFiles as ifs
+                ON i.Id=ifs.itemId
+            INNER JOIN Types as t
+                ON i.TypeId=t.Id
+            WHERE o.UOrderId=${orderId};`
+        );
+
+        return this._createItems(itemsInOrderFromDB);
+    }
+
+    private async _insertCartInOrderItems(
+        orderItems: OrderItem[] | Item[],
+        orderId: number,
+        connection: Connection
+    ): Promise<void> {
+        orderItems.forEach(async item => {
+            await connection.execute(
+                `INSERT INTO OrdersItems (OrderId, ItemId, ItemPrice, ItemQuantity) VALUES (?, ?, ?, ?)`,
+                [orderId, item.$Id, item.$ActualPrice, item.$Quantity]
+            );
+        });
+    }
+
     private _createClient(clientFromDB: any): Client {
         const client: Client = new Client(clientFromDB.Email);
         client.id = clientFromDB.Id;
@@ -132,33 +186,6 @@ export class OrderRepository implements IOrderRepository {
         return address;
     }
 
-    public async readOrderInfoByUserId(
-        userId: number,
-        connection: Connection
-    ): Promise<number> {
-        const [orderInfoFromDB] = await connection.execute(
-            `SELECT o.UOrderId FROM Clients AS c 
-            INNER JOIN Orders as o
-                ON o.ClientId=c.Id
-            WHERE c.UserId=${userId}`
-        );
-
-        return orderInfoFromDB[0].UOrderId;
-    }
-
-    public async readOrderById(
-        orderId: number,
-        connection: Connection
-    ): Promise<Order> {
-        const [orderFromDB] = await connection.execute(
-            `SELECT UOrderId, Status, OrderDate, DeliveryType, DeliveryComment, DeliveryPrice, DeliveryCountry
-                FROM Orders
-            WHERE UOrderId=${orderId};`
-        );
-
-        return this._createOrder(orderFromDB[0]);
-    }
-
     private _createOrder(orderFormDB: any): Order {
         const order: Order = new Order();
         order.uOrderId = orderFormDB.UOrderId;
@@ -169,27 +196,6 @@ export class OrderRepository implements IOrderRepository {
         order.deliveryCountry = orderFormDB.DeliveryCountry;
 
         return order;
-    }
-
-    public async readItemsInOrderById(
-        orderId: number,
-        connection: Connection
-    ): Promise<Item[]> {
-        const [itemsInOrderFromDB] = await connection.execute(
-            `SELECT i.Id, i.Name as ItemName, i.Sex, oi.ItemPrice, t.Name as Type, ifs.FileName, oi.ItemQuantity as Quantity
-                FROM OrdersItems as oi
-            INNER JOIN Items as i
-                ON oi.ItemId=i.Id
-            INNER JOIN Orders as o
-                ON oi.OrderId=o.Id
-            INNER JOIN ItemsFiles as ifs
-                ON i.Id=ifs.itemId
-            INNER JOIN Types as t
-                ON i.TypeId=t.Id
-            WHERE o.UOrderId=${orderId};`
-        );
-
-        return this._createItems(itemsInOrderFromDB);
     }
 
     private _createItems(itemsInOrderFromDB: any): Item[] {
@@ -215,10 +221,10 @@ export class OrderRepository implements IOrderRepository {
         connection: Connection = undefined
     ) {
         const queryWithParams = {
-            query: `INSERT INTO Orders (UOrderId, Status, OrderDate, ClientId, DeliveryAddressId, DeliveryComment, DeliveryType, DeliveryPrice, DeliveryCountry) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            query: `INSERT INTO Orders (UOrderId, StatusId, OrderDate, ClientId, DeliveryAddressId, DeliveryComment, DeliveryType, DeliveryPrice, DeliveryCountry) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             params: [
                 order.$UOrderId,
-                order.$Status,
+                order.$StatusId,
                 order.$OrderDate,
                 order.$ClientId,
                 order.$DeliveryAddressId,

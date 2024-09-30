@@ -11,6 +11,7 @@ import authRouter from './routes/auth.route.ts';
 import userRouter from './routes/users.route.ts';
 import secureOrderRouter from './routes/secureOrder.route.ts';
 import deliveryRouter from './routes/delivery.route.ts';
+import adminRouter from './routes/admin/AdminController.ts';
 
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -51,6 +52,7 @@ app.use(
 app.use('/orders', ordersRouter);
 app.use('/api/v2/auth', authRouter);
 app.use('/api/v2/delivery', deliveryRouter);
+app.use('/api/v2/admin', adminRouter);
 
 app.use(_jwtVerification.verifyUserJWT);
 app.use('/api/v2/users', userRouter);

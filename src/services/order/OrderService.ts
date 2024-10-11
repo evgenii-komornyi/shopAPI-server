@@ -89,7 +89,6 @@ export class OrderService implements IOrderService {
                             order,
                             connection
                         );
-                    console.log(createdOrder);
 
                     response.createdOrder = createdOrder;
                 }

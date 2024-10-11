@@ -2,24 +2,40 @@ import express, { Request, Response, Express, NextFunction } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 
 import itemsRouter from './routes/items.route.ts';
 import typesRouter from './routes/types.route.ts';
 import ordersRouter from './routes/orders.route.ts';
+import authRouter from './routes/auth.route.ts';
+import userRouter from './routes/users.route.ts';
+import secureOrderRouter from './routes/secureOrder.route.ts';
+import deliveryRouter from './routes/delivery.route.ts';
+import adminRouter from './routes/admin/AdminController.ts';
+
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { JWTVerification } from './middlewares/JWTVerification.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app: Express = express();
+const _jwtVerification: JWTVerification = new JWTVerification();
 dotenv.config();
+
+const corsOptions = {
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+};
 
 app.use(
     bodyParser.json({ limit: '30mb', extended: true } as bodyParser.OptionsJson)
 );
 app.use(bodyParser.urlencoded({ limit: '30mb', extended: true }));
-app.use(cors());
+app.use(cookieParser());
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 app.get('/', (req: Request, res: Response) => {
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
@@ -34,6 +50,13 @@ app.use(
     express.static(path.join(__dirname, '..', 'public', 'images'))
 );
 app.use('/orders', ordersRouter);
+app.use('/api/v2/auth', authRouter);
+app.use('/api/v2/delivery', deliveryRouter);
+app.use('/api/v2/admin', adminRouter);
+
+app.use(_jwtVerification.verifyUserJWT);
+app.use('/api/v2/users', userRouter);
+app.use('/api/v2/orders', secureOrderRouter);
 
 app.use((err, req: Request, res: Response, next: NextFunction) => {
     const statusCode = err.statusCode || 500;

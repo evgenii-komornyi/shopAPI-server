@@ -23,13 +23,17 @@ import { CreateOrderRequestValidation } from '../validation/order/CreateOrderReq
 import { OrderValidationErrors } from '../validation/errors/OrderValidationErrors.ts';
 import { OrderCreateRequest } from '../models/requests/order/OrderCreateRequest.ts';
 import { DeliveryType } from '../enums/DeliveryType.ts';
-import { trim } from '../helpers/validation.helper.ts';
+import { sanitize, trim } from '../helpers/validation.helper.ts';
 import { FindOrderRequestValidation } from '../validation/order/FindOrderRequestValidation.ts';
 import { OrderFindRequest } from '../models/requests/order/OrderFindRequest.ts';
+import { OrderItem } from '../models/OrderItem.ts';
+import { UpdateOrderRequestValidation } from '../validation/order/UpdateOrderRequestValidation.ts';
+import { OrderStatus } from '../enums/OrderStatus.ts';
 
 const _validator = new OrderValidation(
     new CreateOrderRequestValidation(),
-    new FindOrderRequestValidation()
+    new FindOrderRequestValidation(),
+    new UpdateOrderRequestValidation()
 );
 
 export const createOrder = async (
@@ -39,22 +43,27 @@ export const createOrder = async (
 ): Promise<void> => {
     let connection;
     const { email, firstName, lastName, phoneNumber } = body.client;
-    const { deliveryType } = body.orderInfo;
+    const { deliveryType, deliveryComment, deliveryPrice, deliveryCountry } =
+        body.orderInfo;
 
     const orderCreateRequest: OrderCreateRequest = new OrderCreateRequest();
-    orderCreateRequest.email = trim(email);
-    orderCreateRequest.firstName = trim(firstName);
-    orderCreateRequest.lastName = trim(lastName);
-    orderCreateRequest.phoneNumber = trim(phoneNumber);
-    orderCreateRequest.deliveryType = trim(deliveryType);
+    orderCreateRequest.email = sanitize(trim(email));
+    orderCreateRequest.firstName = sanitize(trim(firstName));
+    orderCreateRequest.lastName = sanitize(trim(lastName));
+    orderCreateRequest.phoneNumber = sanitize(trim(phoneNumber));
+    orderCreateRequest.deliveryType = sanitize(trim(deliveryType));
+    orderCreateRequest.deliveryComment = sanitize(trim(deliveryComment));
+    orderCreateRequest.orderItems = _generateOrderItems(body.cart);
 
     if (deliveryType === DeliveryType.COURIER) {
         const { country, city, postalCode, address } = body.address;
 
-        orderCreateRequest.country = trim(country);
-        orderCreateRequest.city = trim(city);
-        orderCreateRequest.postalCode = trim(postalCode);
-        orderCreateRequest.address = trim(address);
+        orderCreateRequest.country = sanitize(trim(country));
+        orderCreateRequest.city = sanitize(trim(city));
+        orderCreateRequest.postalCode = sanitize(trim(postalCode));
+        orderCreateRequest.address = sanitize(trim(address));
+        orderCreateRequest.deliveryPrice = sanitize(trim(deliveryPrice));
+        orderCreateRequest.deliveryCountry = sanitize(trim(deliveryCountry));
     }
 
     const validationErrors: OrderValidationErrors[] =
@@ -62,7 +71,7 @@ export const createOrder = async (
 
     if (validationErrors.length === 0) {
         try {
-            connection = await createConnection(config.db);
+            connection = await createConnection(config.development.db);
             await startTransaction(connection);
             const UClientId = generateUniqueId({
                 length: 16,
@@ -112,6 +121,19 @@ export const createOrder = async (
     }
 };
 
+const _generateOrderItems = (cart: any[]): OrderItem[] => {
+    const orderItems: OrderItem[] = cart.map(item => {
+        const orderItem: OrderItem = new OrderItem();
+        orderItem.id = item.id;
+        orderItem.quantity = item.quantity;
+        orderItem.actualPrice = item.actualPrice;
+
+        return orderItem;
+    });
+
+    return orderItems;
+};
+
 export const getOrderById = async (
     req: Request,
     res: Response,
@@ -150,7 +172,6 @@ const _generateOrderDTO = (orderItems, items) => {
     return {
         orderId: orderItems[0].UOrderId,
         items: items.map(item => _generateItemDTO(item)),
-        totalPrice: orderItems[0].TotalPrice,
     };
 };
 
@@ -213,8 +234,9 @@ const _createNewOrderAndGetOrderId = async (
     clientId,
     UOrderId
 ) => {
-    const { deliveryType, deliveryComment, totalPrice } = orderRequest;
-    const orderStatus = 'pending';
+    const { deliveryType, deliveryComment, deliveryPrice, deliveryCountry } =
+        orderRequest;
+    const orderStatusId = OrderStatus.CREATED;
     const orderDate = _getCurrentDateTime();
 
     return await _createAndReturnId(createOrderInDB, {
@@ -223,9 +245,10 @@ const _createNewOrderAndGetOrderId = async (
         deliveryAddressId,
         deliveryType,
         deliveryComment,
-        orderStatus,
+        deliveryPrice,
+        deliveryCountry,
+        orderStatusId,
         orderDate,
-        totalPrice,
     });
 };
 

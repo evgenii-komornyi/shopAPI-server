@@ -31,7 +31,7 @@ export class AdminOrderRepository implements IAdminOrderRepository {
             ON a.Id=o.DeliveryAddressId
         WHERE o.Id=${orderId}`;
 
-        const orderItemsQuery: string = `SELECT i.Name as ItemName, i.Sex, oi.ItemPrice, t.Name as Type, ifs.FileName, oi.ItemQuantity as Quantity
+        const orderItemsQuery: string = `SELECT i.Id as Id, i.Name as ItemName, i.Sex, oi.ItemPrice, t.Name as Type, ifs.FileName, oi.ItemQuantity as Quantity
             FROM OrdersItems as oi
         INNER JOIN Items as i
             ON oi.ItemId=i.Id
@@ -57,7 +57,9 @@ export class AdminOrderRepository implements IAdminOrderRepository {
             Array.isArray(orderFromDB) ? orderFromDB[0] : orderFromDB,
             true
         );
-        order.orderItems = this._createItems(itemsFromDB);
+        order.orderItems = this._createItems(
+            connection ? itemsFromDB[0] : itemsFromDB
+        );
 
         return order;
     }
@@ -172,6 +174,7 @@ export class AdminOrderRepository implements IAdminOrderRepository {
 
     private _createItems(itemsInOrderFromDB: any): Item[] {
         const items: Item[] = [];
+
         itemsInOrderFromDB.forEach(dbItem => {
             const item: Item = new Item();
             item.id = dbItem.Id;

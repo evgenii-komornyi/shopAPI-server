@@ -26,13 +26,15 @@ import { OrderFindDTO } from '../dto/order/OrderFindDTO.ts';
 import { OrderFindDetailsDTO } from '../dto/order/OrderFindDetailsDTO.ts';
 import { Item } from '../models/Item.ts';
 import { OrderItemDTO } from '../dto/order/OrderItemDTO.ts';
+import { UpdateOrderRequestValidation } from '../validation/order/UpdateOrderRequestValidation.ts';
 
 const router: Router = Router();
 
 const _orderRepository: IOrderRepository = new OrderRepository();
 const _orderValidation: OrderValidation = new OrderValidation(
     new CreateOrderRequestValidation(),
-    new FindOrderRequestValidation()
+    new FindOrderRequestValidation(),
+    new UpdateOrderRequestValidation()
 );
 const _transactionManager: ITransactionManager = new TransactionManager();
 

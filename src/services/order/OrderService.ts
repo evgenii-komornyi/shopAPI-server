@@ -56,17 +56,15 @@ export class OrderService implements IOrderService {
                 });
                 order.uOrderId = uOrderId;
                 order.orderDate = new Date();
-                order.status = OrderStatus.PENDING;
+                order.statusId = OrderStatus.CREATED;
                 order.deliveryComment = orderRequest.$DeliveryComment;
                 order.deliveryType = orderRequest.$DeliveryType as DeliveryType;
-
-                if (
-                    orderRequest.$DeliveryPrice &&
-                    orderRequest.$DeliveryCountry
-                ) {
-                    order.deliveryPrice = orderRequest.$DeliveryPrice;
-                    order.deliveryCountry = orderRequest.$DeliveryCountry;
-                }
+                order.deliveryPrice = orderRequest.$DeliveryPrice
+                    ? orderRequest.$DeliveryPrice
+                    : null;
+                order.deliveryCountry = orderRequest.$DeliveryCountry
+                    ? orderRequest.$DeliveryCountry
+                    : null;
 
                 const isClientExists =
                     await this._orderRepository.isClientExists(
@@ -91,6 +89,7 @@ export class OrderService implements IOrderService {
                             order,
                             connection
                         );
+                    console.log(createdOrder);
 
                     response.createdOrder = createdOrder;
                 }

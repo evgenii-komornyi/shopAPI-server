@@ -6,7 +6,11 @@ import { Status } from '../enums/Status.ts';
 dotenv.config();
 
 export class JWTVerification {
-    public verifyUserJWT(req: Request, res: Response, next: NextFunction): any {
+    public verifyUserJWT(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Response {
         const authHeader = req.headers['authorization'];
         if (!authHeader) {
             return res.sendStatus(401);
@@ -30,7 +34,7 @@ export class JWTVerification {
         req: Request,
         res: Response,
         next: NextFunction
-    ): any {
+    ): Response {
         const token = req.query.emailToken;
 
         if (!token) {
@@ -53,5 +57,29 @@ export class JWTVerification {
                 },
             });
         }
+    }
+
+    public verifyAdmin(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Response {
+        const authHeader = req.headers['authorization'];
+        if (!authHeader) {
+            return res.sendStatus(401);
+        }
+
+        const token = authHeader.split(' ')[1];
+
+        jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+            if (err || !decoded.roles.includes('ADMIN')) {
+                return res.sendStatus(403);
+            }
+
+            req.body.userId = decoded.userId;
+            req.body.roles = decoded.roles;
+
+            next();
+        });
     }
 }

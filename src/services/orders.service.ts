@@ -27,10 +27,13 @@ import { sanitize, trim } from '../helpers/validation.helper.ts';
 import { FindOrderRequestValidation } from '../validation/order/FindOrderRequestValidation.ts';
 import { OrderFindRequest } from '../models/requests/order/OrderFindRequest.ts';
 import { OrderItem } from '../models/OrderItem.ts';
+import { UpdateOrderRequestValidation } from '../validation/order/UpdateOrderRequestValidation.ts';
+import { OrderStatus } from '../enums/OrderStatus.ts';
 
 const _validator = new OrderValidation(
     new CreateOrderRequestValidation(),
-    new FindOrderRequestValidation()
+    new FindOrderRequestValidation(),
+    new UpdateOrderRequestValidation()
 );
 
 export const createOrder = async (
@@ -233,7 +236,7 @@ const _createNewOrderAndGetOrderId = async (
 ) => {
     const { deliveryType, deliveryComment, deliveryPrice, deliveryCountry } =
         orderRequest;
-    const orderStatus = 'pending';
+    const orderStatusId = OrderStatus.CREATED;
     const orderDate = _getCurrentDateTime();
 
     return await _createAndReturnId(createOrderInDB, {
@@ -244,7 +247,7 @@ const _createNewOrderAndGetOrderId = async (
         deliveryComment,
         deliveryPrice,
         deliveryCountry,
-        orderStatus,
+        orderStatusId,
         orderDate,
     });
 };

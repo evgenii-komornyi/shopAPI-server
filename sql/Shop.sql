@@ -154,10 +154,10 @@ CREATE TABLE `Orders` (
 --
 
 INSERT INTO `Orders` (`Id`, `Status`, `OrderDate`, `ClientId`, `DeliveryAddressId`, `DeliveryComment`, `DeliveryType`, `UOrderId`) VALUES
-(49, 'pending', '2024-07-17 08:46:40', 134, NULL, '', 'shop', '302791483'),
-(59, 'pending', '2024-08-04 17:15:57', 138, 45, 'Call me before delivery', 'courier', '664535716'),
-(64, 'pending', '2024-08-05 18:02:31', 138, 45, '', 'courier', '115348399'),
-(83, 'pending', '2024-08-05 21:08:27', 138, 45, 'Leave and run', 'courier', '970448215');
+(49, 'created', '2024-07-17 08:46:40', 134, NULL, '', 'shop', '302791483'),
+(59, 'created', '2024-08-04 17:15:57', 138, 45, 'Call me before delivery', 'courier', '664535716'),
+(64, 'created', '2024-08-05 18:02:31', 138, 45, '', 'courier', '115348399'),
+(83, 'created', '2024-08-05 21:08:27', 138, 45, 'Leave and run', 'courier', '970448215');
 
 -- --------------------------------------------------------
 
@@ -231,7 +231,7 @@ INSERT INTO `Types` (`Id`, `Name`, `Description`) VALUES
 (3, 'Giant', 'The giant betta is a type of betta fish that is larger than the standard variety. It is believed to have originated in Thailand, where many of the most successful and well-known super giant betta breeders are located, and where the majority of Giant Betta Fish for sale internationally come from.'),
 (4, 'Dumbo', 'The Dumbo Betta fish gets its name from its large and distinctive pectoral fins that resemble the ears of an elephant. These fins give the fish a unique and striking appearance that has made them a popular choice for aquarium enthusiasts.'),
 (5, 'Wild', 'The Wild Betta Fish, native to Thailand, is a stunning freshwater species for aquarium enthusiasts. Its ability to breathe air from the surface using a labyrinth organ, coupled with its long fins and aggressive behavior, make it an attractive and fascinating addition to any tank. Explore our collection of Wild Betta for sale including betta Imbellis, betta Smaragdina, betta Splendens and Mahachai betta Now!'),
-(6, 'Alien', 'The Alien bettas are a relatively new hybrid breed of betta fish created by cross-breeding various species of wild bettas. Due to their unique colorations and patterns, they have become increasingly popular among aquarium hobbyists. These fish are typically characterized by a black or dark brown body with a striking metallic sheen, which creates a beautiful iridescence and pattern.'),
+(6, 'Alien', 'The Alien bettas are a relatively new hybrid breed of betta fishcreated by cross-breeding various species of wild bettas. Due to their unique colorations and patterns, they have become increasingly popular among aquarium hobbyists. These fish are typically characterized by a black or dark brown body with a striking metallic sheen, which creates a beautiful iridescence and pattern.'),
 (7, 'Dragon', 'A Dragon Betta fish is a popular variety of Betta fish  known for its vibrant, metallic scales that have a shimmering, iridescent effect. The scales are often described as having a \"dragon-like\" appearance, hence the name.'),
 (8, 'Samurai', 'Explore our captivating collection of Samurai Betta for sale at our online store. Find your ideal aquatic companion and embrace the elegance of these magnificent Samurai betta Fish. Shop now!'),
 (9, 'Plakat', 'Explore our mesmerizing Collection of Plakat Betta for sale! Discover stunning Plakat Betta fish with vibrant colors and elegant fins. Bring home the beauty of these captivating aquatic companions. Shop now and find your perfect Betta!'),

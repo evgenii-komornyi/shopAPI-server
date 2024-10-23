@@ -105,70 +105,95 @@ export class OrderService implements IOrderService {
 
     public async readOrder(
         userId: number,
-        orderId: number
+        orderId: number,
+        fullOrderInfo: boolean
     ): Promise<OrderFindResponse> {
         const orderResponse: OrderFindResponse = new OrderFindResponse();
-
         const validationErrors: OrderValidationErrors[] = [];
 
         if (!userId) {
             validationErrors.push(OrderValidationErrors.NO_SEARCH_CRITERIA);
         }
 
-        if (validationErrors.length !== 0) {
+        if (validationErrors.length > 0) {
             orderResponse.validationErrors = validationErrors;
-        } else {
-            try {
-                await this._transactionManager.startTransaction();
-                const connection: Connection =
-                    this._transactionManager.getConnection();
+            return orderResponse;
+        }
 
-                const isClientExists =
-                    await this._orderRepository.isClientExists(
-                        userId,
-                        connection
-                    );
+        try {
+            await this._transactionManager.startTransaction();
+            const connection: Connection =
+                this._transactionManager.getConnection();
 
-                if (isClientExists) {
-                    const isOrderExists =
-                        await this._orderRepository.isOrderExists(
-                            orderId,
-                            connection
-                        );
+            const isClientExists = await this._orderRepository.isClientExists(
+                userId,
+                connection
+            );
 
-                    if (!isOrderExists) {
-                        validationErrors.push(
-                            OrderValidationErrors.ORDER_DOES_NOT_EXISTS
-                        );
-
-                        orderResponse.validationErrors = validationErrors;
-                        this._transactionManager.rollback();
-
-                        return orderResponse;
-                    }
-
-                    const order: Order =
-                        await this._orderRepository.readOrderById(
-                            orderId,
-                            connection
-                        );
-
-                    const items: Item[] =
-                        await this._orderRepository.readItemsInOrderById(
-                            orderId,
-                            connection
-                        );
-
-                    order.orderItems = items;
-
-                    orderResponse.foundOrder = order;
-
-                    this._transactionManager.commit();
-                }
-            } catch (error) {
-                this._transactionManager.rollback();
-                orderResponse.databaseErrors = handleException(error);
+            if (!isClientExists) {
+                validationErrors.push(
+                    OrderValidationErrors.ORDER_DOES_NOT_EXISTS
+                );
+                orderResponse.validationErrors = validationErrors;
+                return orderResponse;
             }
+
+            const isOrderExists = await this._orderRepository.isOrderExists(
+                orderId,
+                connection,
+                userId
+            );
+            if (!isOrderExists) {
+                validationErrors.push(
+                    OrderValidationErrors.ORDER_DOES_NOT_EXISTS
+                );
+                orderResponse.validationErrors = validationErrors;
+                return orderResponse;
+            }
+
+            const order = fullOrderInfo
+                ? await this._orderRepository.readOrderById(
+                      orderId,
+                      connection,
+                      userId
+                  )
+                : await this._orderRepository.readOrderById(
+                      orderId,
+                      connection
+                  );
+
+            if (!fullOrderInfo) {
+                const items = await this._orderRepository.readItemsInOrderById(
+                    orderId,
+                    connection
+                );
+                order.orderItems = items;
+            }
+
+            orderResponse.foundOrder = order;
+            await this._transactionManager.commit();
+        } catch (error) {
+            await this._transactionManager.rollback();
+            orderResponse.databaseErrors = handleException(error);
+            console.error(error);
+        } finally {
+            if (this._transactionManager) {
+                await this._transactionManager.rollback();
+            }
+        }
+
+        return orderResponse;
+    }
+
+    public async readOrders(userId: number): Promise<OrderFindResponse> {
+        const orderResponse: OrderFindResponse = new OrderFindResponse();
+
+        try {
+            orderResponse.foundOrders = await this._orderRepository.readOrders(
+                userId
+            );
+        } catch (error) {
+            orderResponse.databaseErrors = handleException(error);
         }
 
         return orderResponse;

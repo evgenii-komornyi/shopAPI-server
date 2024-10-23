@@ -1,6 +1,6 @@
 import { createConnection, Connection } from 'mysql2/promise';
-import { config } from '../configs/config';
-import { ITransactionManager } from './ITransactionManager';
+import { config } from '../configs/config.ts';
+import { ITransactionManager } from './ITransactionManager.ts';
 
 export class TransactionManager implements ITransactionManager {
     private connection: Connection | null = null;

@@ -15,7 +15,11 @@ export interface IOrderRepository {
     // ): Promise<void>;
 
     isClientExists(userId: number, connection: Connection): Promise<boolean>;
-    isOrderExists(orderId: number, connection: Connection): Promise<boolean>;
+    isOrderExists(
+        orderId: number,
+        connection: Connection,
+        userId: number
+    ): Promise<boolean>;
     readClientInfoByUserId(
         userId: number,
         connection: Connection
@@ -24,9 +28,14 @@ export interface IOrderRepository {
         userId: number,
         connection: Connection
     ): Promise<number>;
-    readOrderById(orderId: number, connection: Connection): Promise<Order>;
+    readOrderById(
+        orderId: number,
+        connection: Connection,
+        userId?: number
+    ): Promise<Order>;
     readItemsInOrderById(
         orderId: number,
         connection: Connection
     ): Promise<Item[]>;
+    readOrders(userId: number): Promise<Order[]>;
 }

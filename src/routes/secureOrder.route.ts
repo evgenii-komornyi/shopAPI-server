@@ -27,6 +27,7 @@ import { OrderFindDetailsDTO } from '../dto/order/OrderFindDetailsDTO.ts';
 import { Item } from '../models/Item.ts';
 import { OrderItemDTO } from '../dto/order/OrderItemDTO.ts';
 import { UpdateOrderRequestValidation } from '../validation/order/UpdateOrderRequestValidation.ts';
+import { OrdersDTO } from '../dto/admin/OrdersDTO.ts';
 
 const router: Router = Router();
 
@@ -86,13 +87,21 @@ router.post('/', async (req: Request, res: Response) => {
 
 router.get('/:orderId', async (req: Request, res: Response) => {
     try {
+        const { userId } = req.body;
+        const { orderId } = req.params;
+        const { hasFullInformation } = req.query;
+        const hasFullInfo: boolean = Boolean(hasFullInformation);
+
         const response: OrderFindResponse = await _orderService.readOrder(
-            req.body.userId,
-            +req.params.orderId
+            userId,
+            +orderId,
+            hasFullInfo
         );
 
         res.status(200).json({
-            data: { ..._generateOrderFindDTO(response) },
+            data: {
+                ..._generateOrderFindDTO(response, hasFullInfo),
+            },
         });
     } catch (error) {
         console.error(error);
@@ -101,7 +110,109 @@ router.get('/:orderId', async (req: Request, res: Response) => {
     }
 });
 
-const _generateOrderFindDTO = (response: OrderFindResponse): OrderFindDTO => {
+router.get('/', async (req: Request, res: Response) => {
+    try {
+        const orderResponse: OrderFindResponse = await _orderService.readOrders(
+            +req.body.userId
+        );
+
+        res.status(200).json({ data: _generateOrdersDTO(orderResponse) });
+    } catch (error) {
+        console.log(error);
+
+        return res.status(500).json('External server error.');
+    }
+});
+
+const _generateOrdersDTO = (response: OrderFindResponse): OrdersDTO => {
+    const ordersDTO: OrdersDTO = new OrdersDTO();
+
+    if (response.hasDatabaseErrors()) {
+        ordersDTO.$status = Status.FAILED;
+        ordersDTO.$databaseErrors = response.$DatabaseErrors;
+    } else {
+        ordersDTO.$orders = response.$FoundOrders.map(orderItem =>
+            _generateFindOrderDetailsDTO(orderItem)
+        );
+
+        ordersDTO.$status = Status.SUCCESS;
+    }
+
+    return ordersDTO;
+};
+
+const _generateFindOrderDetailsDTO = (
+    order: Order,
+    withAdditionalInfo: boolean = false
+): OrderFindDetailsDTO => {
+    const orderFindDetailsDTO: OrderFindDetailsDTO = new OrderFindDetailsDTO();
+
+    const deliveryPrice: string = order.$DeliveryPrice;
+
+    orderFindDetailsDTO.$id = order.$Id;
+    orderFindDetailsDTO.$uOrderId = order.$UOrderId;
+    orderFindDetailsDTO.$orderStatus = order.$Status;
+    orderFindDetailsDTO.$orderDate = order.$OrderDate;
+
+    if (withAdditionalInfo) {
+        orderFindDetailsDTO.$orderStatusId = order.$StatusId;
+        orderFindDetailsDTO.$deliveryPrice = deliveryPrice;
+        orderFindDetailsDTO.$deliveryType = order.$DeliveryType;
+        orderFindDetailsDTO.$deliveryComment = order.$DeliveryComment;
+        orderFindDetailsDTO.$clientId = order.$ClientId;
+        orderFindDetailsDTO.$addressId = order.$DeliveryAddressId;
+
+        const client: Client = order.$Client;
+        const orderItems: OrderItem[] | Item[] = order.$OrderItems;
+
+        if (client) {
+            orderFindDetailsDTO.$client = _generateClientDetailsDTO(client);
+        }
+
+        if (orderItems && orderItems.length > 0) {
+            orderFindDetailsDTO.$orderItems = orderItems.map(item =>
+                _generateOrderItemDTO(item)
+            );
+            orderFindDetailsDTO.$totalPrice = _calculateTotalPrice(
+                orderItems,
+                deliveryPrice
+            );
+        }
+    }
+
+    return orderFindDetailsDTO;
+};
+
+const _calculateTotalPrice = (
+    orderItems: (Item | OrderItem)[],
+    deliveryPrice: string
+): number => {
+    const itemsTotalPrice = orderItems.reduce((acc, item) => {
+        if ('$ItemPrice' in item) {
+            return acc + item.$ItemPrice * item.$Quantity;
+        }
+    }, 0);
+
+    return itemsTotalPrice + Number(deliveryPrice);
+};
+
+const _generateOrderItemDTO = (item: Item): OrderItemDTO => {
+    const orderItemDTO: OrderItemDTO = new OrderItemDTO();
+    orderItemDTO.$id = item.$Id;
+    orderItemDTO.$itemName = item.$ItemName;
+    orderItemDTO.$type = item.$Type;
+    orderItemDTO.$fileName = item.$FileName;
+    orderItemDTO.$itemPrice = item.$ItemPrice;
+    orderItemDTO.$quantity = item.$Quantity;
+    orderItemDTO.$sex = item.$Sex;
+
+    return orderItemDTO;
+};
+
+const _generateOrderFindDTO = (
+    response: OrderFindResponse,
+    hasFullInformation: boolean
+): OrderFindDTO => {
     const orderFindDTO: OrderFindDTO = new OrderFindDTO();
 
     if (response.hasValidationErrors() || response.hasDatabaseErrors()) {
@@ -110,7 +221,8 @@ const _generateOrderFindDTO = (response: OrderFindResponse): OrderFindDTO => {
         orderFindDTO.$databaseErrors = response.$DatabaseErrors;
     } else {
         orderFindDTO.$order = _generateOrderFindDetailsDTO(
-            response.$FoundOrder
+            response.$FoundOrder,
+            hasFullInformation
         );
         orderFindDTO.$status = Status.SUCCESS;
     }
@@ -118,7 +230,10 @@ const _generateOrderFindDTO = (response: OrderFindResponse): OrderFindDTO => {
     return orderFindDTO;
 };
 
-const _generateOrderFindDetailsDTO = (order: Order): OrderFindDetailsDTO => {
+const _generateOrderFindDetailsDTO = (
+    order: Order,
+    hasFullInformation: boolean
+): OrderFindDetailsDTO => {
     const orderFindDetailsDTO: OrderFindDetailsDTO = new OrderFindDetailsDTO();
     orderFindDetailsDTO.$id = order.$Id;
     orderFindDetailsDTO.$orderStatus = order.$Status;
@@ -126,6 +241,15 @@ const _generateOrderFindDetailsDTO = (order: Order): OrderFindDetailsDTO => {
     orderFindDetailsDTO.$deliveryType = order.$DeliveryType;
     orderFindDetailsDTO.$deliveryComment = order.$DeliveryComment;
     orderFindDetailsDTO.$orderDate = order.$OrderDate;
+
+    if (hasFullInformation) {
+        orderFindDetailsDTO.$totalPrice = _calculateTotalPrice(
+            order.$OrderItems,
+            order.$DeliveryPrice
+        );
+        orderFindDetailsDTO.$client = _generateClientDetailsDTO(order.$Client);
+    }
+
     orderFindDetailsDTO.$orderItems = _generateOrderItemsDTO(order.$OrderItems);
 
     return orderFindDetailsDTO;

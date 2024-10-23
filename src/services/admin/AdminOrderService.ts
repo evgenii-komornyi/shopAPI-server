@@ -117,8 +117,12 @@ export class AdminOrderService implements IAdminOrderService {
         } catch (error) {
             await this._transactionManager.rollback();
             orderResponse.databaseErrors = handleException(error);
-            console.log(error);
+        } finally {
+            if (this._transactionManager) {
+                await this._transactionManager.rollback();
+            }
         }
+
         return orderResponse;
     }
 }

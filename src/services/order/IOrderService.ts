@@ -4,5 +4,10 @@ import { OrderFindResponse } from '../../models/responses/order/OrderFindRespons
 
 export interface IOrderService {
     createOrder(orderRequest: OrderCreateRequest): Promise<OrderCreateResponse>;
-    readOrder(userId: number, orderId: number): Promise<OrderFindResponse>;
+    readOrder(
+        userId: number,
+        orderId: number,
+        fullOrderInfo: boolean
+    ): Promise<OrderFindResponse>;
+    readOrders(userId: number): Promise<OrderFindResponse>;
 }

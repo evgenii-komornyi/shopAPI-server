@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Май 30 2024 г., 16:45
+-- Время создания: Окт 05 2024 г., 21:02
 -- Версия сервера: 8.0.30
 -- Версия PHP: 7.2.34
 
@@ -41,12 +41,21 @@ CREATE TABLE `Addresses` (
 --
 
 INSERT INTO `Addresses` (`Id`, `ClientId`, `Country`, `City`, `Address`, `PostalCode`) VALUES
-(20, 67, 'Lithuania', 'Vilnus', 'Nava pr. 10', 'EU-5203'),
-(23, 72, 'Latvia', 'Riga', 'Kurzemes prospekts 10', 'LV-1069'),
-(24, 73, 'Lithuania', 'Vilnus', 'Nava pr. 10', 'EU-5203'),
-(25, 74, 'Lithuania', 'Vilnus', 'Nava pr. 10', 'EU-5203'),
-(26, 75, 'Lithuania', 'Vilnus', 'Nava pr. 10', 'EU-5203'),
-(27, 76, 'Lithuania', 'Vilnus', 'Nava pr. 10', 'EU-5203');
+(45, 138, 'Latvia', 'Riga', 'UzKurieniAcisSkatas 666', 'LV-1069'),
+(46, 139, 'Lithuania', 'Vilnus', 'Nava pr. 10', 'LT-10000'),
+(47, 140, 'Latvia', 'Riga', 'Nava pr. 10', 'LV-1000'),
+(48, 141, 'Latvia', 'Riga', 'Nava pr. 10', 'LV-1000'),
+(49, 142, 'Latvia', 'Riga', 'Nava pr. 10', 'LV-1000'),
+(50, 143, 'Latvia', 'Riga', 'Nava pr. 10', 'LV-1000'),
+(51, 144, 'Latvia', 'Riga', 'Nava pr. 10', 'LV-1000'),
+(52, 145, 'Latvia', 'Riga', 'Nava pr. 10', 'LV-1000'),
+(53, 146, 'Latvia', 'Riga', 'Nava pr. 10', 'LV-1000'),
+(54, 147, 'Estonia', 'Tallin', 'Kukuruku prospekts 10-4', '10000'),
+(55, 148, 'Lithuania', 'Vilnus', 'Nava pr. 10', 'LT-10000'),
+(56, 149, 'Lithuania', 'Vilnus', 'Nava pr. 10', 'LT-10000'),
+(57, 150, 'Lithuania', 'Vilnus', 'Nava pr. 10', 'LT-10000'),
+(58, 151, 'Lithuania', 'Vilnus', 'Nava pr. 10', 'LT-10000'),
+(59, 152, 'Lithuania', 'Vilnus', 'Nava pr. 10', 'LT-10000');
 
 -- --------------------------------------------------------
 
@@ -57,28 +66,57 @@ INSERT INTO `Addresses` (`Id`, `ClientId`, `Country`, `City`, `Address`, `Postal
 CREATE TABLE `Clients` (
   `Id` int NOT NULL,
   `Email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `PhoneNumber` varchar(15) NOT NULL,
+  `PhoneNumber` varchar(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `CreationDate` datetime NOT NULL,
   `UpdateDate` datetime NOT NULL,
   `FirstName` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `LastName` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `UClientId` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL
+  `UClientId` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `UserId` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Дамп данных таблицы `Clients`
 --
 
-INSERT INTO `Clients` (`Id`, `Email`, `PhoneNumber`, `CreationDate`, `UpdateDate`, `FirstName`, `LastName`, `UClientId`) VALUES
-(67, 'test@test.test', '+669852114556', '2024-05-14 10:54:09', '2024-05-14 10:54:09', 'Test', 'Testov', '5949341030486182'),
-(68, 'blackdead666999@gmail.com', '25615015', '2024-05-15 13:48:19', '2024-05-15 13:48:19', 'Evgenii', 'Komornyi', '6920319108756100'),
-(69, 'blackdead666999@gmail.com', '25615015', '2024-05-16 07:50:39', '2024-05-16 07:50:39', 'Evgenii', 'Komornyi', '7067334726571925'),
-(72, 'blackdead666999@gmail.com', '+37125615015', '2024-05-23 12:53:13', '2024-05-23 12:53:13', 'Evgenii', 'Komornyi', '6043758673305800'),
-(73, 'test@test.test', '+669852114556', '2024-05-29 08:21:33', '2024-05-29 08:21:33', 'Test', 'Testov', '9271638288031502'),
-(74, 'test@test.test', '+669852114556', '2024-05-29 08:23:53', '2024-05-29 08:23:53', 'Test', 'Testov', '9444715654556702'),
-(75, 'test@test.test', '+669852114556', '2024-05-29 08:26:11', '2024-05-29 08:26:11', 'Test', 'Testov', '2215859638481371'),
-(76, 'test@test.test', '+669852114556', '2024-05-29 08:27:54', '2024-05-29 08:27:54', 'Test', 'Testov', '1034931860054593'),
-(77, 'test@tet.test', '+37125615015', '2024-05-30 12:10:08', '2024-05-30 12:10:08', 'Vasia', 'Pupkin', '0381093492489530');
+INSERT INTO `Clients` (`Id`, `Email`, `PhoneNumber`, `CreationDate`, `UpdateDate`, `FirstName`, `LastName`, `UClientId`, `UserId`) VALUES
+(134, 'blackdead666999@gmail.com', '+37125615015', '2024-07-17 08:46:40', '2024-07-17 08:46:40', 'Evgenii', 'Komornyi', '5971375685709703', NULL),
+(138, 'evgeniikomornyi@gmail.com', '+37125615015', '2024-07-18 14:32:37', '2024-07-26 15:34:25', 'Evgenii', 'Komornyi', '1586751010054704', 185),
+(139, 'test@test.test', '+669852114556', '2024-08-05 14:23:01', '2024-08-05 14:23:01', 'Test', 'Testov', '7635581333717668', NULL),
+(140, 'test@test.test', '+669852114556', '2024-08-28 08:45:11', '2024-08-28 08:45:11', 'Test', 'Testov', '0375127737211559', NULL),
+(141, 'test@test.test', '+669852114556', '2024-08-28 08:47:56', '2024-08-28 08:47:56', 'Test', 'Testov', '1765903675520307', NULL),
+(142, 'test@test.test', '+669852114556', '2024-08-28 08:54:18', '2024-08-28 08:54:18', 'Test', 'Testov', '5513069433147839', NULL),
+(143, 'test@test.test', '+669852114556', '2024-08-28 08:59:02', '2024-08-28 08:59:02', 'Test', 'Testov', '2196759102022252', NULL),
+(144, 'test@test.test', '+669852114556', '2024-08-28 09:01:30', '2024-08-28 09:01:30', 'Test', 'Testov', '7480431933290658', NULL),
+(145, 'test@test.test', '+669852114556', '2024-08-28 11:13:08', '2024-08-28 11:13:08', 'Test', 'Testov', '7550562954932146', NULL),
+(146, 'test@test.test', '+669852114556', '2024-08-28 11:14:32', '2024-08-28 11:14:32', 'Test', 'Testov', '4243201511454884', NULL),
+(147, 'blackdead666999@gmail.com', '+37125615015', '2024-09-13 18:34:50', '2024-09-13 18:34:50', 'Evgenii', 'Komornyi', '0196231357998948', 187),
+(148, 'test@test.test', '+669852114556', '2024-09-19 07:57:46', '2024-09-19 07:57:46', 'Test', 'Testov', '5143198213449718', NULL),
+(149, 'test@test.test', '+669852114556', '2024-09-19 07:59:43', '2024-09-19 07:59:43', 'Test', 'Testov', '0356723646454605', NULL),
+(150, 'test@test.test', '+669852114556', '2024-09-19 08:07:42', '2024-09-19 08:07:42', 'Test', 'Testov', '6139038657036512', NULL),
+(151, 'test@test.test', '+669852114556', '2024-09-19 08:17:02', '2024-09-19 08:17:02', 'Test', 'Testov', '2406659616350779', NULL),
+(152, 'test@test.test', '+669852114556', '2024-09-19 08:17:17', '2024-09-19 08:17:17', 'Test', 'Testov', '9698541023203241', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `Delivery`
+--
+
+CREATE TABLE `Delivery` (
+  `Id` int NOT NULL,
+  `Country` varchar(50) NOT NULL,
+  `Price` decimal(10,0) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Дамп данных таблицы `Delivery`
+--
+
+INSERT INTO `Delivery` (`Id`, `Country`, `Price`) VALUES
+(2, 'Latvia', '2'),
+(3, 'Lithuania', '4'),
+(4, 'Estonia', '6');
 
 -- --------------------------------------------------------
 
@@ -149,13 +187,14 @@ INSERT INTO `ItemsFiles` (`Id`, `FileName`, `ItemId`) VALUES
 
 CREATE TABLE `Orders` (
   `Id` int NOT NULL,
-  `Status` varchar(20) NOT NULL,
+  `StatusId` int NOT NULL,
   `OrderDate` datetime NOT NULL,
   `ClientId` int NOT NULL,
   `DeliveryAddressId` int DEFAULT NULL,
   `DeliveryComment` varchar(100) DEFAULT NULL,
-  `TotalPrice` decimal(9,2) NOT NULL,
   `DeliveryType` varchar(255) NOT NULL,
+  `DeliveryPrice` decimal(10,2) DEFAULT NULL,
+  `DeliveryCountry` varchar(20) DEFAULT NULL,
   `UOrderId` varchar(12) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -163,16 +202,10 @@ CREATE TABLE `Orders` (
 -- Дамп данных таблицы `Orders`
 --
 
-INSERT INTO `Orders` (`Id`, `Status`, `OrderDate`, `ClientId`, `DeliveryAddressId`, `DeliveryComment`, `TotalPrice`, `DeliveryType`, `UOrderId`) VALUES
-(38, 'pending', '2024-05-14 10:54:09', 67, 20, 'Call me before delivery', '50.50', 'courier', '702150625'),
-(39, 'pending', '2024-05-15 13:48:19', 68, NULL, '', '78.43', 'shop', '563802416'),
-(40, 'pending', '2024-05-16 07:50:39', 69, NULL, '', '44.80', 'shop', '369316588'),
-(43, 'pending', '2024-05-23 12:53:13', 72, 23, '', '127.41', 'courier', '731580628'),
-(44, 'pending', '2024-05-29 08:21:33', 73, 24, 'Call me before delivery', '50.50', 'courier', '823026019'),
-(45, 'pending', '2024-05-29 08:23:53', 74, 25, 'Call me before delivery', '50.50', 'courier', '311365157'),
-(46, 'pending', '2024-05-29 08:26:11', 75, 26, 'Call me before delivery', '50.50', 'courier', '355495655'),
-(47, 'pending', '2024-05-29 08:27:54', 76, 27, 'Call me before delivery', '50.50', 'courier', '060479837'),
-(48, 'pending', '2024-05-30 12:10:08', 77, NULL, '', '91.00', 'shop', '930054097');
+INSERT INTO `Orders` (`Id`, `StatusId`, `OrderDate`, `ClientId`, `DeliveryAddressId`, `DeliveryComment`, `DeliveryType`, `DeliveryPrice`, `DeliveryCountry`, `UOrderId`) VALUES
+(90, 3, '2024-09-19 11:30:54', 138, 45, 'Call me before delivery', 'courier', '2.00', 'Latvia', '677136965'),
+(91, 5, '2024-09-24 13:32:25', 138, 45, '', 'courier', '2.00', 'Latvia', '664176982'),
+(92, 1, '2024-09-24 13:41:20', 138, 45, '', 'shop', NULL, NULL, '542620238');
 
 -- --------------------------------------------------------
 
@@ -193,26 +226,55 @@ CREATE TABLE `OrdersItems` (
 --
 
 INSERT INTO `OrdersItems` (`Id`, `OrderId`, `ItemId`, `ItemPrice`, `ItemQuantity`) VALUES
-(63, 38, 1, '74.70', 1),
-(64, 38, 3, '39.23', 1),
-(65, 38, 2, '47.60', 1),
-(66, 39, 3, '39.23', 1),
-(67, 39, 8, '39.20', 1),
-(68, 40, 7, '44.80', 1),
-(74, 43, 11, '42.47', 3),
-(75, 44, 2, '47.60', 1),
-(76, 44, 3, '39.23', 1),
-(77, 44, 1, '74.70', 1),
-(78, 45, 1, '74.70', 1),
-(79, 45, 2, '47.60', 1),
-(80, 45, 3, '39.23', 1),
-(81, 46, 1, '74.70', 1),
-(82, 46, 3, '39.23', 1),
-(83, 46, 2, '47.60', 1),
-(84, 47, 1, '74.70', 1),
-(85, 47, 3, '39.23', 1),
-(86, 47, 2, '47.60', 1),
-(87, 48, 9, '45.50', 2);
+(156, 90, 1, '74.70', 1),
+(157, 90, 2, '47.60', 1),
+(158, 90, 3, '39.23', 1),
+(159, 91, 8, '39.20', 1),
+(160, 92, 7, '44.80', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `Roles`
+--
+
+CREATE TABLE `Roles` (
+  `Id` int NOT NULL,
+  `Role` varchar(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Дамп данных таблицы `Roles`
+--
+
+INSERT INTO `Roles` (`Id`, `Role`) VALUES
+(6, 'ADMIN');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `Status`
+--
+
+CREATE TABLE `Status` (
+  `Id` int NOT NULL,
+  `Status` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Дамп данных таблицы `Status`
+--
+
+INSERT INTO `Status` (`Id`, `Status`) VALUES
+(1, 'Created'),
+(2, 'Awaiting payment'),
+(3, 'Awaiting shipment'),
+(4, 'Completed'),
+(5, 'Cancelled'),
+(6, 'Returned'),
+(7, 'Refunded'),
+(8, 'Failed'),
+(9, 'Shipped');
 
 -- --------------------------------------------------------
 
@@ -267,6 +329,51 @@ INSERT INTO `Types` (`Id`, `Name`, `Description`) VALUES
 (13, 'Spade', 'Discover Spade Tail Betta for sale at our online store. Explore a stunning selection of these graceful bettas and find your perfect aquatic companion. Shop now and bring home the beauty of these captivating Spade Tail Betta Fish!'),
 (14, 'Avatar', 'The Avatar Betta Fish, also know as the Black Star Betta, is a majestic aquatic marvel for your tank! With its vibrant, iridescent colors reminiscent of the mythical world, this betta fish embodies ethereal beauty. Its flowing fins and captivating hues create a stunning aquatic spectacle.');
 
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `UserRole`
+--
+
+CREATE TABLE `UserRole` (
+  `Id` int NOT NULL,
+  `UserId` int DEFAULT NULL,
+  `RoleId` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Дамп данных таблицы `UserRole`
+--
+
+INSERT INTO `UserRole` (`Id`, `UserId`, `RoleId`) VALUES
+(1, 185, 6);
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `Users`
+--
+
+CREATE TABLE `Users` (
+  `Id` int NOT NULL,
+  `Email` varchar(255) NOT NULL,
+  `Password` varchar(255) NOT NULL,
+  `CreatedAt` datetime NOT NULL,
+  `UpdatedAt` datetime NOT NULL,
+  `LastLoginAt` datetime DEFAULT NULL,
+  `IsActive` tinyint(1) NOT NULL DEFAULT '1',
+  `IsVerified` tinyint(1) NOT NULL DEFAULT '0',
+  `UUserId` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Дамп данных таблицы `Users`
+--
+
+INSERT INTO `Users` (`Id`, `Email`, `Password`, `CreatedAt`, `UpdatedAt`, `LastLoginAt`, `IsActive`, `IsVerified`, `UUserId`) VALUES
+(185, 'evgeniikomornyi@gmail.com', '$2b$10$SF6jyf1RnsOowo59CdUj4uVX2u77XmkZ.6IBUzx9SE1tJSqY8DnXm', '2024-07-18 14:32:37', '2024-07-18 14:32:37', '2024-09-19 11:24:05', 1, 1, 'd7gttyloup9q12jh'),
+(187, 'blackdead666999@gmail.com', '$2b$10$cV4fRIoUoEK/sVG1tTCFw.lBGdJxfFuC2V9sZCo5QeHwjjlbV/hem', '2024-09-13 18:34:50', '2024-09-13 18:34:50', '2024-09-13 19:01:05', 1, 1, 'yidfq07rydba897p');
+
 --
 -- Индексы сохранённых таблиц
 --
@@ -283,7 +390,14 @@ ALTER TABLE `Addresses`
 --
 ALTER TABLE `Clients`
   ADD PRIMARY KEY (`Id`),
-  ADD UNIQUE KEY `UClientId` (`UClientId`);
+  ADD UNIQUE KEY `UClientId` (`UClientId`),
+  ADD KEY `UserId` (`UserId`);
+
+--
+-- Индексы таблицы `Delivery`
+--
+ALTER TABLE `Delivery`
+  ADD PRIMARY KEY (`Id`);
 
 --
 -- Индексы таблицы `Items`
@@ -305,7 +419,8 @@ ALTER TABLE `ItemsFiles`
 ALTER TABLE `Orders`
   ADD PRIMARY KEY (`Id`),
   ADD UNIQUE KEY `UOrderId` (`UOrderId`),
-  ADD KEY `ClientId` (`ClientId`);
+  ADD KEY `ClientId` (`ClientId`),
+  ADD KEY `StatusId` (`StatusId`);
 
 --
 -- Индексы таблицы `OrdersItems`
@@ -314,6 +429,18 @@ ALTER TABLE `OrdersItems`
   ADD PRIMARY KEY (`Id`),
   ADD KEY `OrderId` (`OrderId`),
   ADD KEY `ItemId` (`ItemId`);
+
+--
+-- Индексы таблицы `Roles`
+--
+ALTER TABLE `Roles`
+  ADD PRIMARY KEY (`Id`);
+
+--
+-- Индексы таблицы `Status`
+--
+ALTER TABLE `Status`
+  ADD PRIMARY KEY (`Id`);
 
 --
 -- Индексы таблицы `TypeFiles`
@@ -329,6 +456,22 @@ ALTER TABLE `Types`
   ADD PRIMARY KEY (`Id`);
 
 --
+-- Индексы таблицы `UserRole`
+--
+ALTER TABLE `UserRole`
+  ADD PRIMARY KEY (`Id`),
+  ADD KEY `RoleId` (`RoleId`),
+  ADD KEY `UserId` (`UserId`);
+
+--
+-- Индексы таблицы `Users`
+--
+ALTER TABLE `Users`
+  ADD PRIMARY KEY (`Id`),
+  ADD UNIQUE KEY `UUserId` (`UUserId`),
+  ADD UNIQUE KEY `Email` (`Email`);
+
+--
 -- AUTO_INCREMENT для сохранённых таблиц
 --
 
@@ -336,13 +479,19 @@ ALTER TABLE `Types`
 -- AUTO_INCREMENT для таблицы `Addresses`
 --
 ALTER TABLE `Addresses`
-  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
 
 --
 -- AUTO_INCREMENT для таблицы `Clients`
 --
 ALTER TABLE `Clients`
-  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=153;
+
+--
+-- AUTO_INCREMENT для таблицы `Delivery`
+--
+ALTER TABLE `Delivery`
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT для таблицы `Items`
@@ -360,13 +509,25 @@ ALTER TABLE `ItemsFiles`
 -- AUTO_INCREMENT для таблицы `Orders`
 --
 ALTER TABLE `Orders`
-  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=93;
 
 --
 -- AUTO_INCREMENT для таблицы `OrdersItems`
 --
 ALTER TABLE `OrdersItems`
-  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=88;
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=161;
+
+--
+-- AUTO_INCREMENT для таблицы `Roles`
+--
+ALTER TABLE `Roles`
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT для таблицы `Status`
+--
+ALTER TABLE `Status`
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT для таблицы `TypeFiles`
@@ -381,6 +542,18 @@ ALTER TABLE `Types`
   MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
+-- AUTO_INCREMENT для таблицы `UserRole`
+--
+ALTER TABLE `UserRole`
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT для таблицы `Users`
+--
+ALTER TABLE `Users`
+  MODIFY `Id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=188;
+
+--
 -- Ограничения внешнего ключа сохраненных таблиц
 --
 
@@ -389,6 +562,12 @@ ALTER TABLE `Types`
 --
 ALTER TABLE `Addresses`
   ADD CONSTRAINT `addresses_ibfk_1` FOREIGN KEY (`ClientId`) REFERENCES `Clients` (`Id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+--
+-- Ограничения внешнего ключа таблицы `Clients`
+--
+ALTER TABLE `Clients`
+  ADD CONSTRAINT `clients_ibfk_1` FOREIGN KEY (`UserId`) REFERENCES `Users` (`Id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
 -- Ограничения внешнего ключа таблицы `Items`
@@ -406,7 +585,8 @@ ALTER TABLE `ItemsFiles`
 -- Ограничения внешнего ключа таблицы `Orders`
 --
 ALTER TABLE `Orders`
-  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`ClientId`) REFERENCES `Clients` (`Id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+  ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`ClientId`) REFERENCES `Clients` (`Id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  ADD CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`StatusId`) REFERENCES `Status` (`Id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
 -- Ограничения внешнего ключа таблицы `OrdersItems`
@@ -420,6 +600,13 @@ ALTER TABLE `OrdersItems`
 --
 ALTER TABLE `TypeFiles`
   ADD CONSTRAINT `typefiles_ibfk_1` FOREIGN KEY (`TypeId`) REFERENCES `Types` (`Id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+--
+-- Ограничения внешнего ключа таблицы `UserRole`
+--
+ALTER TABLE `UserRole`
+  ADD CONSTRAINT `userrole_ibfk_1` FOREIGN KEY (`RoleId`) REFERENCES `Roles` (`Id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  ADD CONSTRAINT `userrole_ibfk_2` FOREIGN KEY (`UserId`) REFERENCES `Users` (`Id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

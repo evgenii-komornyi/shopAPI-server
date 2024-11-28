@@ -15,7 +15,7 @@ export class FindItemRequestValidation
 
     private _validateItemId(itemId: string) {
         const errors: ItemValidationErrors[] = [];
-        const onlyDigits: RegExp = /^\d$/;
+        const onlyDigits: RegExp = /^\d+$/;
 
         if (!onlyDigits.test(itemId)) {
             errors.push(ItemValidationErrors.NO_SEARCH_CRITERIA);
